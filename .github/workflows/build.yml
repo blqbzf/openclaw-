@@ -29,13 +29,13 @@ jobs:
     
     - name: Build Windows EXE
       run: |
-        pyinstaller --clean --noconfirm --onefile --windowed --name "P1时光WoW登录器" --add-data "launcher_config.json;." wow_launcher.py
+        pyinstaller --clean --noconfirm --onefile --windowed --name "P1WoWLauncher" --add-data "launcher_config.json;." wow_launcher.py
     
     - name: Create distribution package
       shell: bash
       run: |
         mkdir -p dist/release
-        cp dist/P1时光WoW登录器.exe dist/release/ 2>/dev/null || cp dist/*.exe dist/release/
+        cp dist/P1WoWLauncher.exe dist/release/ 2>/dev/null || cp dist/*.exe dist/release/
         cp launcher_config.json dist/release/
         cp README.md dist/release/ 2>/dev/null || true
         
