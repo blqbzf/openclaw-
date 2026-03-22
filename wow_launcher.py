@@ -420,32 +420,39 @@ class WoWLauncherV3_1:
     def create_content(self):
         """创建内容区域"""
         
-        # 左侧面板 - 公告区
-        left_frame = tk.Frame(self.root, bg="#1a1a1a")
-        left_frame.place(x=30, y=100, width=500, height=380)
+        # 左侧面板 - 公告区（半透明效果）
+        left_frame = tk.Frame(self.root, bg="#0a0a0a", bd=0)
+        left_frame.place(x=30, y=100, width=480, height=360)
+        # 设置半透明效果（通过alpha）
+        try:
+            left_frame.attributes("-alpha", 0.7)
+        except:
+            pass
         
         # 公告标题
         tk.Label(
             left_frame,
             text="📜 服务器公告",
-            font=("微软雅黑", 14, "bold"),
+            font=("微软雅黑", 13, "bold"),
             fg="#ffd700",
-            bg="#1a1a1a"
-        ).pack(anchor="w", pady=(0,10))
+            bg="#0a0a0a",
+            bd=0
+        ).pack(anchor="w", padx=10, pady=(10,5))
         
         # 公告内容
         news_text = tk.Text(
             left_frame,
-            font=("微软雅黑", 10),
-            bg="#2a2a2a",
-            fg="#d0d0d0",
+            font=("微软雅黑", 9),
+            bg="#0a0a0a",
+            fg="#e0e0e0",
             wrap="word",
             bd=0,
             highlightthickness=1,
             highlightcolor="#c9a030",
-            highlightbackground="#3a3a3a"
+            highlightbackground="#3a3a3a",
+            height=18
         )
-        news_text.pack(fill="both", expand=True)
+        news_text.pack(fill="both", expand=True, padx=10, pady=(0,10))
         
         news_content = """🎮 欢迎来到诺兰时光魔兽！
 
@@ -486,9 +493,9 @@ class WoWLauncherV3_1:
         news_text.insert("1.0", news_content)
         news_text.config(state="disabled")
         
-        # 右侧面板 - 功能区
-        right_frame = tk.Frame(self.root, bg="#1a1a1a")
-        right_frame.place(x=550, y=100, width=220, height=380)
+        # 右侧面板 - 功能区（半透明）
+        right_frame = tk.Frame(self.root, bg="#0a0a0a", bd=0)
+        right_frame.place(x=530, y=100, width=240, height=360)
         
         # 服务器状态
         status_frame = tk.LabelFrame(
@@ -496,8 +503,8 @@ class WoWLauncherV3_1:
             text=" 服务器状态 ",
             font=("微软雅黑", 10, "bold"),
             fg="#ffd700",
-            bg="#2a2a2a",
-            bd=2,
+            bg="#0a0a0a",
+            bd=1,
             relief="solid"
         )
         status_frame.pack(fill="x", pady=(0,10))
@@ -508,7 +515,7 @@ class WoWLauncherV3_1:
             text="状态: 🟢 在线",
             font=("微软雅黑", 9),
             fg="#4caf50",
-            bg="#2a2a2a"
+            bg="#0a0a0a"
         ).pack(anchor="w", padx=10, pady=5)
         
         tk.Label(
@@ -516,7 +523,7 @@ class WoWLauncherV3_1:
             text="在线: 127 玩家",
             font=("微软雅黑", 9),
             fg="#ffd700",
-            bg="#2a2a2a"
+            bg="#0a0a0a"
         ).pack(anchor="w", padx=10, pady=5)
         
         tk.Label(
@@ -524,7 +531,7 @@ class WoWLauncherV3_1:
             text=f"IP: {self.config['server_ip']}",
             font=("微软雅黑", 9),
             fg="#64b5f6",
-            bg="#2a2a2a"
+            bg="#0a0a0a"
         ).pack(anchor="w", padx=10, pady=5)
         
         # 客户端设置
@@ -533,8 +540,8 @@ class WoWLauncherV3_1:
             text=" 客户端设置 ",
             font=("微软雅黑", 10, "bold"),
             fg="#ffd700",
-            bg="#2a2a2a",
-            bd=2,
+            bg="#0a0a0a",
+            bd=1,
             relief="solid"
         )
         settings_frame.pack(fill="x", pady=(0,10))
@@ -543,9 +550,9 @@ class WoWLauncherV3_1:
         self.path_entry = tk.Entry(
             settings_frame,
             font=("微软雅黑", 9),
-            bg="#1a1a1a",
-            fg="#d0d0d0",
-            insertbackground="#d0d0d0",
+            bg="#0a0a0a",
+            fg="#e0e0e0",
+            insertbackground="#e0e0e0",
             bd=0,
             highlightthickness=1,
             highlightcolor="#c9a030",
@@ -554,7 +561,7 @@ class WoWLauncherV3_1:
         self.path_entry.pack(fill="x", padx=10, pady=5)
         
         # 按钮框架
-        btn_frame = tk.Frame(settings_frame, bg="#2a2a2a")
+        btn_frame = tk.Frame(settings_frame, bg="#0a0a0a")
         btn_frame.pack(fill="x", padx=10, pady=5)
         
         # 自动搜索按钮
@@ -599,9 +606,9 @@ class WoWLauncherV3_1:
                 right_frame,
                 text=text,
                 font=("微软雅黑", 10),
-                bg="#2a2a2a",
+                bg="#0a0a0a",
                 fg="#ffd700",
-                activebackground="#3a3a3a",
+                activebackground="#2a2a2a",
                 activeforeground="#ffd700",
                 bd=1,
                 relief="solid",
@@ -610,9 +617,9 @@ class WoWLauncherV3_1:
             )
             btn.pack(fill="x", pady=5)
         
-        # 底部启动按钮区域
-        launch_frame = tk.Frame(self.root, bg="#1a1a1a")
-        launch_frame.place(x=30, y=500, width=740, height=70)
+        # 底部启动按钮区域（半透明）
+        launch_frame = tk.Frame(self.root, bg="#0a0a0a", bd=0)
+        launch_frame.place(x=30, y=480, width=740, height=70)
         
         # 启动按钮（魔兽风格大按钮）
         self.launch_btn = tk.Button(
@@ -625,9 +632,10 @@ class WoWLauncherV3_1:
             activeforeground="#1a1a1a",
             bd=0,
             cursor="hand2",
+            height=1,
             command=self.launch_game_with_check
         )
-        self.launch_btn.pack(fill="both", expand=True, pady=10)
+        self.launch_btn.pack(fill="both", expand=True, pady=5, padx=5)
         
         # 悬停效果
         self.launch_btn.bind("<Enter>", lambda e: self.launch_btn.config(bg="#ffd700"))
