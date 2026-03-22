@@ -121,15 +121,21 @@ class PatchManager:
             # 使用鸽子命规范的url字段
             download_url = patch_info.get('download_url')
             
+            print(f"[DEBUG] 开始下载补丁: {patch_name}")
+            print(f"[DEBUG] 下载地址: {download_url}")
+            
             if not download_url:
                 return False, "下载地址为空"
             
             # 临时文件路径
             temp_path = os.path.join(self.client_path, f".temp_{patch_name}")
+            print(f"[DEBUG] 临时路径: {temp_path}")
             
             # 下载文件
             response = requests.get(download_url, stream=True, timeout=30)
             total_size = int(response.headers.get('content-length', 0))
+            print(f"[DEBUG] 文件大小: {total_size} bytes ({total_size/1024:.1f} KB)")
+            
             downloaded = 0
             
             with open(temp_path, 'wb') as f:
@@ -141,6 +147,8 @@ class PatchManager:
                             progress = int((downloaded / total_size) * 100)
                             progress_callback(progress, f"下载中 {progress}%")
             
+            print(f"[DEBUG] 下载完成: {downloaded} bytes")
+            
             # 校验MD5
             if progress_callback:
                 progress_callback(100, "校验文件...")
@@ -148,6 +156,9 @@ class PatchManager:
             md5_hash = patch_info.get('md5')
             if md5_hash:
                 calculated_md5 = self.calculate_md5(temp_path)
+                print(f"[DEBUG] 期望MD5: {md5_hash}")
+                print(f"[DEBUG] 实际MD5: {calculated_md5}")
+                
                 if calculated_md5 != md5_hash:
                     os.remove(temp_path)
                     return False, f"MD5校验失败（期望:{md5_hash[:8]}... 实际:{calculated_md5[:8]}...）"
@@ -157,11 +168,29 @@ class PatchManager:
                 progress_callback(100, "应用补丁...")
             
             target_path = os.path.join(self.data_path, patch_name)
-            shutil.move(temp_path, target_path)
+            print(f"[DEBUG] 目标路径: {target_path}")
             
-            return True, "补丁应用成功"
+            # 检查Data目录是否存在
+            if not os.path.exists(self.data_path):
+                print(f"[DEBUG] 错误: Data目录不存在 - {self.data_path}")
+                return False, f"Data目录不存在: {self.data_path}"
+            
+            shutil.move(temp_path, target_path)
+            print(f"[DEBUG] 补丁已移动到: {target_path}")
+            
+            # 验证文件
+            if os.path.exists(target_path):
+                file_size = os.path.getsize(target_path)
+                print(f"[DEBUG] 验证成功: 文件存在，大小 {file_size} bytes")
+                return True, "补丁应用成功"
+            else:
+                print(f"[DEBUG] 错误: 文件移动失败")
+                return False, "文件移动失败"
             
         except Exception as e:
+            print(f"[DEBUG] 下载异常: {e}")
+            import traceback
+            traceback.print_exc()
             return False, f"下载失败: {str(e)}"
     
     def calculate_md5(self, file_path):
@@ -879,6 +908,9 @@ class WoWLauncherV3_1:
                 for i, patch in enumerate(patches):
                     patch_name = patch['name']
                     
+                    print(f"\n[DEBUG] ========== 开始处理补丁 {i+1}/{len(patches)} ==========")
+                    print(f"[DEBUG] 补丁名称: {patch_name}")
+                    
                     # 更新进度
                     def update_progress(percent, status):
                         progress_label.config(text=f"{patch_name}: {status}")
@@ -889,22 +921,47 @@ class WoWLauncherV3_1:
                         lambda p, s: self.root.after(0, lambda: update_progress(p, s))
                     )
                     
+                    print(f"[DEBUG] 下载结果: {'成功' if success else '失败'}")
+                    print(f"[DEBUG] 返回消息: {message}")
+                    
                     if success:
                         # 更新本地版本
                         self.patch_manager.update_local_version(patch)
+                        print(f"[DEBUG] 本地版本已更新")
                     else:
                         self.root.after(0, lambda: progress_window.destroy())
                         self.root.after(0, lambda: messagebox.showerror("错误", f"补丁安装失败：\n{message}"))
                         return
                 
-                # 全部完成
+                # 全部完成 - 显示Data目录中的补丁文件
+                print(f"\n[DEBUG] ========== 补丁安装完成 ==========")
+                print(f"[DEBUG] Data目录: {self.patch_manager.data_path}")
+                print(f"[DEBUG] 检查补丁文件:")
+                
+                patch_files = []
+                if os.path.exists(self.patch_manager.data_path):
+                    for file in os.listdir(self.patch_manager.data_path):
+                        if file.startswith('patch-ZP') and file.endswith('.MPQ'):
+                            file_path = os.path.join(self.patch_manager.data_path, file)
+                            file_size = os.path.getsize(file_path)
+                            print(f"[DEBUG] ✓ {file} ({file_size} bytes)")
+                            patch_files.append(f"{file} ({file_size/1024:.1f} KB)")
+                
                 self.root.after(0, lambda: progress_window.destroy())
-                self.root.after(0, lambda: messagebox.showinfo(
-                    "更新完成",
-                    f"✅ 成功安装 {len(patches)} 个补丁！\n\n可以开始游戏了！"
-                ))
+                
+                if patch_files:
+                    result_msg = f"✅ 成功安装 {len(patches)} 个补丁！\n\n已安装的补丁：\n"
+                    result_msg += "\n".join([f"• {f}" for f in patch_files])
+                    result_msg += "\n\n可以开始游戏了！"
+                else:
+                    result_msg = f"✅ 下载完成，但未找到补丁文件\n\nData目录: {self.patch_manager.data_path}"
+                
+                self.root.after(0, lambda: messagebox.showinfo("更新完成", result_msg))
                 
             except Exception as e:
+                print(f"[DEBUG] 下载线程异常: {e}")
+                import traceback
+                traceback.print_exc()
                 self.root.after(0, lambda: progress_window.destroy())
                 self.root.after(0, lambda: messagebox.showerror("错误", f"下载失败：\n{str(e)}"))
         
