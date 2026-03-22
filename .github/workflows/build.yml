@@ -32,7 +32,7 @@ jobs:
     
     - name: Build Windows EXE
       run: |
-        pyinstaller --clean --noconfirm --onefile --windowed --name "P1WoWLauncher" --add-data "launcher_config.json;." wow_launcher.py
+        pyinstaller --clean --noconfirm --onefile --windowed --name "P1WoWLauncher" --add-data "launcher_config.json;." --hidden-import=psutil --hidden-import=psutil._pswindows --hidden-import=psutil._common wow_launcher.py
     
     - name: Create distribution package
       shell: bash
@@ -93,7 +93,7 @@ jobs:
     
     - name: Build Mac APP
       run: |
-        pyinstaller --clean --noconfirm --windowed --name "P1时光WoW登录器" --add-data "launcher_config.json:." wow_launcher.py
+        pyinstaller --clean --noconfirm --windowed --name "P1时光WoW登录器" --add-data "launcher_config.json:." --hidden-import=psutil --hidden-import=psutil._psosx --hidden-import=psutil._common wow_launcher.py
     
     - name: Create distribution package
       run: |
