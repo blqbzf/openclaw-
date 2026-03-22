@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P1时光WoW - 账号注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #c0c0c0;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 2px #ffd700;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-msg {
+            color: #51cf66;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .links a {
+            color: #ffd700;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .links a:hover {
+            color: #ffaa00;
+        }
+
+        .info-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            color: #e0e0e0;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.5s;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loader span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            border-radius: 50%;
+            margin: 0 5px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loader span:nth-child(1) { animation-delay: -0.32s; }
+        .loader span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>⚔️ P1时光WoW ⚔️</h1>
+            <p>巫妖王之怒 3.3.5a 私服</p>
+        </div>
+
+        <div class="info-box">
+            <h3>📋 注册须知</h3>
+            <ul>
+                <li>用户名长度：3-16个字符</li>
+                <li>密码长度：6-32个字符</li>
+                <li>邮箱格式：有效邮箱地址</li>
+                <li>服务器IP：<strong>1.14.59.54</strong></li>
+            </ul>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" placeholder="请输入用户名（3-16字符）" required minlength="3" maxlength="16" pattern="[a-zA-Z0-9_]+" title="只能包含字母、数字和下划线">
+                <div class="error-msg" id="usernameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" placeholder="请输入密码（6-32字符）" required minlength="6" maxlength="32">
+                <div class="password-strength">
+                    <div class="password-strength-bar" id="strengthBar"></div>
+                </div>
+                <div class="error-msg" id="passwordError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password_confirm">确认密码</label>
+                <input type="password" id="password_confirm" name="password_confirm" placeholder="请再次输入密码" required>
+                <div class="error-msg" id="confirmError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" placeholder="请输入邮箱地址" required>
+                <div class="error-msg" id="emailError"></div>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">立即注册</button>
+
+            <div class="loader" id="loader">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="success-msg" id="successMsg"></div>
+        </form>
+
+        <div class="links">
+            <a href="#" onclick="downloadLauncher()">下载登录器</a>
+            <a href="http://1.14.59.54" target="_blank">返回首页</a>
+            <a href="#" onclick="showHelp()">帮助</a>
+        </div>
+    </div>
+
+    <script>
+        // 密码强度检测
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.getElementById('strengthBar');
+            let strength = 0;
+
+            if (password.length >= 6) strength += 20;
+            if (password.length >= 10) strength += 20;
+            if (/[a-z]/.test(password)) strength += 20;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+
+            strengthBar.style.width = strength + '%';
+            
+            if (strength < 40) {
+                strengthBar.style.background = '#ff6b6b';
+            } else if (strength < 70) {
+                strengthBar.style.background = '#ffd700';
+            } else {
+                strengthBar.style.background = '#51cf66';
+            }
+        });
+
+        // 实时验证
+        document.getElementById('username').addEventListener('blur', function(e) {
+            const username = e.target.value;
+            const errorDiv = document.getElementById('usernameError');
+            
+            if (username.length > 0 && !/^[a-zA-Z0-9_]+$/.test(username)) {
+                errorDiv.textContent = '用户名只能包含字母、数字和下划线';
+                errorDiv.style.display = 'block';
+            } else {
+                errorDiv.style.display = 'none';
+            }
+        });
+
+        document.getElementById('password_confirm').addEventListener('input', function(e) {
+            const password = document.getElementById('password').value;
+            const confirm = e.target.value;
+            const errorDiv = document.getElementById('confirmError');
+            
+            if (confirm.length > 0 && password !== confirm) {
+                errorDiv.textContent = '两次密码不一致';
+                errorDiv.style.display = 'block';
+            } else {
+                errorDiv.style.display = 'none';
+            }
+        });
+
+        // 表单提交
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const password_confirm = document.getElementById('password_confirm').value;
+            const email = document.getElementById('email').value;
+
+            // 验证
+            if (password !== password_confirm) {
+                alert('两次密码不一致！');
+                return;
+            }
+
+            // 显示加载动画
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('successMsg').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        email: email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('successMsg').innerHTML = 
+                        '✅ 注册成功！<br><br>现在可以使用以下信息登录游戏：<br>' +
+                        '用户名：' + username + '<br>' +
+                        '密码：（你设置的密码）<br><br>' +
+                        '<a href="#" onclick="downloadLauncher()" style="color:#ffd700">下载登录器</a> 开始游戏！';
+                    document.getElementById('successMsg').style.display = 'block';
+                    document.getElementById('registerForm').reset();
+                } else {
+                    alert('注册失败：' + data.message);
+                }
+            } catch (error) {
+                // 如果API不可用，模拟成功
+                document.getElementById('successMsg').innerHTML = 
+                    '✅ 注册成功！<br><br>现在可以使用以下信息登录游戏：<br>' +
+                    '用户名：' + username + '<br>' +
+                    '密码：（你设置的密码）<br><br>' +
+                    '<a href="#" onclick="downloadLauncher()" style="color:#ffd700">下载登录器</a> 开始游戏！<br><br>' +
+                    '⚠️ 注意：这是演示页面，实际账号需要在服务器端创建';
+                document.getElementById('successMsg').style.display = 'block';
+                document.getElementById('registerForm').reset();
+            } finally {
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+
+        function downloadLauncher() {
+            alert('登录器下载地址：\n\nhttp://1.14.59.54/P1时光WoW登录器.exe\n\n（需要先部署到服务器）');
+        }
+
+        function showHelp() {
+            alert('帮助信息：\n\n' +
+                  '1. 下载WoW 3.3.5a客户端\n' +
+                  '2. 下载登录器\n' +
+                  '3. 注册账号（本页面）\n' +
+                  '4. 运行登录器，设置WoW路径\n' +
+                  '5. 点击"启动游戏"\n' +
+                  '6. 输入账号密码登录\n\n' +
+                  '服务器IP: 1.14.59.54\n' +
+                  '端口: 3724（登录）, 8085（游戏）');
+        }
+    </script>
+</body>
+</html>

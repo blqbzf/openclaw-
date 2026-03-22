@@ -1,0 +1,3 @@
+([('P1时光WoW登录器',
+   '/Users/mac/Documents/bobo/boboai/test_1_openclaw/wow_launcher/dist/P1时光WoW登录器',
+   'EXECUTABLE')],)
