@@ -619,11 +619,6 @@ class WoWLauncherV3:
     
     def run_security_check(self):
         """运行安全检测"""
-        messagebox.showinfo(
-            "安全检测",
-            "正在进行安全检测...\n\n请稍候..."
-        )
-        
         cheats = self.check_cheats()
         scripts = self.check_scripts()
         
