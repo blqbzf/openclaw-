@@ -49,11 +49,21 @@ class PatchManager:
         try:
             # 使用鸽子命规范：manifest.json
             manifest_url = f"{self.patch_url}/manifest.json"
+            print(f"[DEBUG] 正在获取: {manifest_url}")
+            
             response = requests.get(manifest_url, timeout=10)
+            print(f"[DEBUG] 响应状态: {response.status_code}")
+            
             if response.status_code == 200:
-                return response.json()
+                data = response.json()
+                print(f"[DEBUG] 成功获取manifest: {data}")
+                return data
+            else:
+                print(f"[DEBUG] HTTP错误: {response.status_code}")
         except Exception as e:
-            print(f"获取补丁清单失败: {e}")
+            print(f"[DEBUG] 获取补丁清单失败: {e}")
+            import traceback
+            traceback.print_exc()
         return None
     
     def check_for_updates(self):
@@ -740,26 +750,41 @@ class WoWLauncherV3_1:
     def check_for_updates_silent(self):
         """静默检查更新"""
         client_path = self.path_entry.get().strip()
+        
+        # 调试日志
+        print(f"[DEBUG] 检查更新 - 客户端路径: {client_path}")
+        
         if not client_path:
+            print(f"[DEBUG] 客户端路径为空，跳过更新检查")
             return
         
         if not self.patch_manager:
             self.init_patch_manager()
         
         if not self.patch_manager:
+            print(f"[DEBUG] 补丁管理器初始化失败")
             return
         
         # 后台线程检查更新
         def check_thread():
             try:
+                print(f"[DEBUG] 开始检查更新...")
                 manifest, needed_patches = self.patch_manager.check_for_updates()
+                
+                print(f"[DEBUG] manifest: {manifest}")
+                print(f"[DEBUG] needed_patches: {needed_patches}")
                 
                 if needed_patches:
                     # 发现新补丁，显示更新提示
                     patch_names = "\n".join([f"• {p['name']} v{p.get('version', '?')}" for p in needed_patches])
+                    print(f"[DEBUG] 发现新补丁:\n{patch_names}")
                     self.root.after(0, lambda: self.show_update_dialog(needed_patches, patch_names))
+                else:
+                    print(f"[DEBUG] 无需更新")
             except Exception as e:
-                print(f"检查更新失败: {e}")
+                print(f"[DEBUG] 检查更新失败: {e}")
+                import traceback
+                traceback.print_exc()
         
         thread = threading.Thread(target=check_thread, daemon=True)
         thread.start()
