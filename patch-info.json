@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "patch_file": "patch-ZP1.MPQ",
+  "download_url": "http://1.14.59.54:8080/patches/patch-ZP1.MPQ",
+  "file_size": 10240,
+  "md5": "abc123def456...",
+  "required": true,
+  "description": "P1时光WoW客户端补丁 - 时光行者坐骑图标",
+  "changelog": [
+    "添加时光行者坐骑图标（entry 706004）"
+  ],
+  "min_client_version": "3.3.5a",
+  "release_date": "2026-03-23"
+}

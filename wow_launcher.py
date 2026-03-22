@@ -47,10 +47,16 @@ class PatchManager:
     def fetch_manifest(self):
         """获取服务器补丁清单"""
         try:
-            manifest_url = f"{self.patch_url}/manifest.json"
+            # 使用鸽子命规范：patch-info.json
+            manifest_url = f"{self.patch_url}/patch-info.json"
             response = requests.get(manifest_url, timeout=10)
             if response.status_code == 200:
-                return response.json()
+                patch_info = response.json()
+                # 转换为统一的manifest格式
+                return {
+                    "version": patch_info.get("version", "0"),
+                    "patches": [patch_info] if patch_info.get("patch_file") else []
+                }
         except Exception as e:
             print(f"获取补丁清单失败: {e}")
         return None
@@ -68,17 +74,33 @@ class PatchManager:
         local_patches = {p['name']: p for p in local_version.get('patches', [])}
         
         for patch in remote_manifest.get('patches', []):
-            patch_name = patch['name']
+            # 适配鸽子命格式
+            patch_name = patch.get('patch_file') or patch.get('name')
+            patch_version = patch.get('version', '0')
             
             # 检查是否已安装
             if patch_name not in local_patches:
-                needed_patches.append(patch)
+                # 转换为统一格式
+                needed_patches.append({
+                    'name': patch_name,
+                    'version': patch_version,
+                    'download_url': patch.get('download_url'),
+                    'md5': patch.get('md5'),
+                    'size': patch.get('file_size'),
+                    'description': patch.get('description', '')
+                })
             else:
                 # 检查版本号
                 local_ver = local_patches[patch_name].get('version', '0')
-                remote_ver = patch.get('version', '0')
-                if remote_ver > local_ver:
-                    needed_patches.append(patch)
+                if patch_version > local_ver:
+                    needed_patches.append({
+                        'name': patch_name,
+                        'version': patch_version,
+                        'download_url': patch.get('download_url'),
+                        'md5': patch.get('md5'),
+                        'size': patch.get('file_size'),
+                        'description': patch.get('description', '')
+                    })
         
         return remote_manifest, needed_patches
     
@@ -86,13 +108,14 @@ class PatchManager:
         """下载补丁文件"""
         try:
             patch_name = patch_info['name']
-            patch_url = f"{self.patch_url}/patches/{patch_name}"
+            # 使用鸽子命规范的download_url
+            download_url = patch_info.get('download_url') or f"{self.patch_url}/patches/{patch_name}"
             
             # 临时文件路径
             temp_path = os.path.join(self.client_path, f".temp_{patch_name}")
             
             # 下载文件
-            response = requests.get(patch_url, stream=True, timeout=30)
+            response = requests.get(download_url, stream=True, timeout=30)
             total_size = int(response.headers.get('content-length', 0))
             downloaded = 0
             
