@@ -13,6 +13,8 @@ import json
 import shutil
 import psutil
 import hashlib
+import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -29,6 +31,11 @@ class WoWLauncherV3:
         
         # 服务器配置
         self.config = self.load_config()
+        
+        # 反作弊监控相关
+        self.monitoring_active = False
+        self.game_process = None
+        self.monitor_thread = None
         
         # 创建魔兽风格UI
         self.create_wow_style_ui()
@@ -690,16 +697,20 @@ class WoWLauncherV3:
         # 启动游戏
         try:
             os.chdir(client_path)
-            subprocess.Popen([wow_exe])
+            self.game_process = subprocess.Popen([wow_exe])
             
             # 记录日志
             with open("launcher.log", 'a', encoding='utf-8') as f:
                 f.write(f"{datetime.now()}: 游戏启动成功 (安全检测通过)\n")
             
+            # 启动反作弊实时监控
+            self.start_anti_cheat_monitor()
+            
             messagebox.showinfo(
                 "成功",
                 "✅ 安全检测通过！\n\n"
                 "游戏启动成功！\n"
+                "🛡️ 反作弊系统已启动实时监控\n"
                 "愿圣光与你同在！ ⚔️"
             )
             
@@ -767,6 +778,97 @@ class WoWLauncherV3:
             messagebox.showinfo("成功", f"已清除缓存：\n{', '.join(deleted)}")
         else:
             messagebox.showinfo("提示", "未找到缓存文件")
+    
+    def start_anti_cheat_monitor(self):
+        """启动反作弊实时监控"""
+        self.monitoring_active = True
+        self.monitor_thread = threading.Thread(target=self.monitor_loop, daemon=True)
+        self.monitor_thread.start()
+        
+        # 记录日志
+        with open("launcher.log", 'a', encoding='utf-8') as f:
+            f.write(f"{datetime.now()}: 反作弊实时监控已启动\n")
+    
+    def monitor_loop(self):
+        """监控循环（每5秒检测一次）"""
+        while self.monitoring_active:
+            try:
+                # 检查游戏是否还在运行
+                if self.game_process:
+                    if self.game_process.poll() is not None:
+                        # 游戏已退出
+                        self.monitoring_active = False
+                        with open("launcher.log", 'a', encoding='utf-8') as f:
+                            f.write(f"{datetime.now()}: 游戏已退出，停止监控\n")
+                        break
+                
+                # 检测外挂进程
+                cheats = self.check_cheats()
+                if cheats:
+                    # 发现外挂，立即退出游戏
+                    self.stop_game(cheats)
+                    break
+                
+                # 检测非法脚本
+                scripts = self.check_scripts()
+                if scripts:
+                    # 发现脚本，立即退出游戏
+                    self.stop_game(scripts)
+                    break
+                
+                # 等待5秒
+                time.sleep(5)
+                
+            except Exception as e:
+                # 记录错误
+                with open("launcher.log", 'a', encoding='utf-8') as f:
+                    f.write(f"{datetime.now()}: 监控错误 - {str(e)}\n")
+                time.sleep(5)
+    
+    def stop_game(self, violations):
+        """强制退出游戏并记录违规"""
+        try:
+            # 终止游戏进程
+            if self.game_process:
+                self.game_process.terminate()
+                try:
+                    self.game_process.wait(timeout=5)
+                except:
+                    self.game_process.kill()
+            
+            # 同时搜索并终止所有Wow.exe进程
+            for proc in psutil.process_iter(['pid', 'name']):
+                try:
+                    if proc.info['name'] and 'wow.exe' in proc.info['name'].lower():
+                        proc.terminate()
+                except:
+                    pass
+            
+            # 停止监控
+            self.monitoring_active = False
+            
+            # 记录违规日志
+            with open("violation.log", 'a', encoding='utf-8') as f:
+                f.write(f"\n{'='*60}\n")
+                f.write(f"{datetime.now()} - 检测到违规行为\n")
+                f.write(f"{'='*60}\n")
+                for violation in violations:
+                    f.write(f"  • {violation}\n")
+                f.write(f"{'='*60}\n\n")
+            
+            # 显示警告（需要在主线程）
+            self.root.after(0, lambda: messagebox.showerror(
+                "⚠️ 检测到违规行为",
+                f"检测到外挂/脚本运行！\n\n"
+                f"违规项目：\n{chr(10).join(violations[:5])}\n\n"
+                f"游戏已强制退出！\n"
+                f"违规行为已记录到 violation.log\n\n"
+                f"使用外挂将导致永久封禁！"
+            ))
+            
+        except Exception as e:
+            with open("launcher.log", 'a', encoding='utf-8') as f:
+                f.write(f"{datetime.now()}: 强制退出游戏失败 - {str(e)}\n")
 
 
 def main():
