@@ -32,14 +32,15 @@ jobs:
     
     - name: Build Windows EXE
       run: |
-        pyinstaller --clean --noconfirm --onefile --windowed --name "P1WoWLauncher" --add-data "launcher_config.json;." --hidden-import=psutil --hidden-import=psutil._pswindows --hidden-import=psutil._common wow_launcher.py
+        pyinstaller --clean --noconfirm --onefile --windowed --name "NolanWoWLauncher" --add-data "launcher_config.json;." --add-data "background.jpg;." --hidden-import=psutil --hidden-import=psutil._pswindows --hidden-import=psutil._common --hidden-import=PIL --hidden-import=PIL.Image --hidden-import=PIL.ImageTk wow_launcher.py
     
     - name: Create distribution package
       shell: bash
       run: |
         mkdir -p dist/release
-        cp dist/P1WoWLauncher.exe dist/release/ 2>/dev/null || cp dist/*.exe dist/release/
+        cp dist/诺兰时光魔兽登录器.exe dist/release/ 2>/dev/null || cp dist/*.exe dist/release/
         cp launcher_config.json dist/release/
+        cp background.jpg dist/release/ 2>/dev/null || true
         cp README.md dist/release/ 2>/dev/null || true
         
         # Create README
@@ -65,13 +66,13 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       shell: powershell
       run: |
-        Compress-Archive -Path dist/release/* -DestinationPath dist/P1WoWLauncher-Windows.zip
+        Compress-Archive -Path dist/release/* -DestinationPath dist/NolanWoWLauncher-Windows.zip
     
     - name: Upload to Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
-        files: dist/P1WoWLauncher-Windows.zip
+        files: dist/NolanWoWLauncher-Windows.zip
         generate_release_notes: true
 
   build-mac:
@@ -93,7 +94,7 @@ jobs:
     
     - name: Build Mac APP
       run: |
-        pyinstaller --clean --noconfirm --windowed --name "P1时光WoW登录器" --add-data "launcher_config.json:." --hidden-import=psutil --hidden-import=psutil._psosx --hidden-import=psutil._common wow_launcher.py
+        pyinstaller --clean --noconfirm --windowed --name "诺兰时光魔兽登录器" --add-data "launcher_config.json:." --add-data "background.jpg:." --hidden-import=psutil --hidden-import=psutil._psosx --hidden-import=psutil._common --hidden-import=PIL --hidden-import=PIL.Image --hidden-import=PIL.ImageTk wow_launcher.py
     
     - name: Create distribution package
       run: |
@@ -113,7 +114,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       run: |
         cd dist/release
-        zip -r ../P1WoWLauncher-Mac.zip *
+        zip -r ../NolanWoWLauncher-Mac.zip *
     
     - name: Upload to Release
       if: startsWith(github.ref, 'refs/tags/')

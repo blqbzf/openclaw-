@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-P1时光WoW登录器 v3.1 - 增量补丁自动更新系统
+诺兰时光魔兽登录器 v3.1 - 增量补丁自动更新系统
 新增功能：自动检测、下载、应用补丁
 """
 
@@ -186,7 +186,7 @@ class PatchManager:
 class WoWLauncherV3_1:
     def __init__(self, root):
         self.root = root
-        self.root.title("P1时光WoW - 登录器")
+        self.root.title("诺兰时光魔兽 - 登录器")
         
         # 窗口设置 - 异形窗口
         self.root.geometry("800x600")
@@ -195,6 +195,18 @@ class WoWLauncherV3_1:
         
         # 服务器配置
         self.config = self.load_config()
+        
+        # 背景图片
+        self.background_image = None
+        try:
+            from PIL import Image, ImageTk
+            bg_path = self.get_background_path()
+            if os.path.exists(bg_path):
+                pil_image = Image.open(bg_path)
+                pil_image = pil_image.resize((800, 600), Image.Resampling.LANCZOS)
+                self.background_image = ImageTk.PhotoImage(pil_image)
+        except:
+            pass
         
         # 补丁管理
         self.patch_manager = None
@@ -220,7 +232,7 @@ class WoWLauncherV3_1:
         """加载配置"""
         config_file = "launcher_config.json"
         default_config = {
-            "server_name": "P1时光WoW",
+            "server_name": "诺兰时光魔兽",
             "server_ip": "1.14.59.54",
             "register_url": "http://1.14.59.54:5000",
             "website_url": "",
@@ -275,11 +287,34 @@ class WoWLauncherV3_1:
         )
         self.canvas.pack()
         
+        # 尝试加载背景图片
+        try:
+            from PIL import Image, ImageTk
+            bg_path = self.get_background_path()
+            if os.path.exists(bg_path):
+                pil_image = Image.open(bg_path)
+                # 调整大小为800x600
+                pil_image = pil_image.resize((800, 600), Image.Resampling.LANCZOS)
+                self.background_photo = ImageTk.PhotoImage(pil_image)
+                # 在canvas上绘制背景
+                self.canvas.create_image(0, 0, anchor=tk.NW, image=self.background_photo)
+        except Exception as e:
+            print(f"加载背景图片失败: {e}")
+        
         # 绘制魔兽风格边框
         self.draw_wow_frame()
         
         # 创建内容区域
         self.create_content()
+    
+    def get_background_path(self):
+        """获取背景图片路径"""
+        # PyInstaller打包后的路径
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(base_path, "background.jpg")
     
     def draw_wow_frame(self):
         """绘制魔兽风格边框"""
@@ -333,7 +368,7 @@ class WoWLauncherV3_1:
         # 标题文字
         self.canvas.create_text(
             400, 50,
-            text="⚔️ P1 时光WoW ⚔️",
+            text="⚔️ 诺兰时光魔兽 ⚔️",
             font=("华文行楷", 28, "bold"),
             fill="#ffd700"
         )
@@ -412,7 +447,7 @@ class WoWLauncherV3_1:
         )
         news_text.pack(fill="both", expand=True)
         
-        news_content = """🎮 欢迎来到P1时光WoW！
+        news_content = """🎮 欢迎来到诺兰时光魔兽！
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -601,7 +636,7 @@ class WoWLauncherV3_1:
         # 底部版权
         self.canvas.create_text(
             400, 575,
-            text="© 2026 P1时光WoW | Powered by AzerothCore | 自动更新已启用",
+            text="© 2026 诺兰时光魔兽 | Powered by AzerothCore | 自动更新已启用",
             font=("Arial", 8),
             fill="#5a5a5a"
         )
