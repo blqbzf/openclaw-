@@ -63,10 +63,9 @@ jobs:
     
     - name: Create ZIP for Release
       if: startsWith(github.ref, 'refs/tags/')
-      shell: bash
+      shell: powershell
       run: |
-        cd dist/release
-        zip -r ../P1WoWLauncher-Windows.zip *
+        Compress-Archive -Path dist/release/* -DestinationPath dist/P1WoWLauncher-Windows.zip
     
     - name: Upload to Release
       if: startsWith(github.ref, 'refs/tags/')
