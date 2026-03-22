@@ -32,23 +32,28 @@ jobs:
         pyinstaller --clean --noconfirm --onefile --windowed --name "P1时光WoW登录器" --add-data "launcher_config.json;." wow_launcher.py
     
     - name: Create distribution package
+      shell: bash
       run: |
-        mkdir dist/发布包
-        copy dist/P1时光WoW登录器.exe dist/发布包/
-        copy launcher_config.json dist/发布包/
-        copy 使用说明.txt dist/发布包/ 2>nul || echo 创建使用说明
-        copy README.md dist/发布包/
+        mkdir -p dist/release
+        cp dist/P1时光WoW登录器.exe dist/release/ 2>/dev/null || cp dist/*.exe dist/release/
+        cp launcher_config.json dist/release/
+        cp README.md dist/release/ 2>/dev/null || true
         
-        # 创建使用说明
-        echo P1时光WoW登录器 使用说明 > dist/发布包/使用说明.txt
-        echo ================================ >> dist/发布包/使用说明.txt
-        echo. >> dist/发布包/使用说明.txt
-        echo 1. 首次运行：设置WoW 3.3.5a客户端路径 >> dist/发布包/使用说明.txt
-        echo 2. 注册账号：点击"注册账号"按钮 >> dist/发布包/使用说明.txt
-        echo 3. 启动游戏：点击"启动游戏" >> dist/发布包/使用说明.txt
-        echo. >> dist/发布包/使用说明.txt
-        echo 服务器IP: 1.14.59.54 >> dist/发布包/使用说明.txt
-        echo 端口: 3724 (登录), 8085 (游戏) >> dist/发布包/使用说明.txt
+        # Create README
+        cat > dist/release/README.txt << 'EOF'
+P1时光WoW登录器 使用说明
+================================
+
+1. 首次运行：设置WoW 3.3.5a客户端路径
+2. 注册账号：点击"注册账号"按钮
+3. 启动游戏：点击"启动游戏"
+
+服务器IP: 1.14.59.54
+端口: 3724 (登录), 8085 (游戏)
+注册: http://1.14.59.54:5000
+
+祝游戏愉快！
+EOF
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
