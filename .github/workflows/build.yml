@@ -40,20 +40,16 @@ jobs:
         cp README.md dist/release/ 2>/dev/null || true
         
         # Create README
-        cat > dist/release/README.txt << 'EOF'
-P1时光WoW登录器 使用说明
-================================
-
-1. 首次运行：设置WoW 3.3.5a客户端路径
-2. 注册账号：点击"注册账号"按钮
-3. 启动游戏：点击"启动游戏"
-
-服务器IP: 1.14.59.54
-端口: 3724 (登录), 8085 (游戏)
-注册: http://1.14.59.54:5000
-
-祝游戏愉快！
-EOF
+        echo "P1时光WoW登录器 使用说明" > dist/release/README.txt
+        echo "================================" >> dist/release/README.txt
+        echo "" >> dist/release/README.txt
+        echo "1. 首次运行：设置WoW 3.3.5a客户端路径" >> dist/release/README.txt
+        echo "2. 注册账号：点击注册账号按钮" >> dist/release/README.txt
+        echo "3. 启动游戏：点击启动游戏" >> dist/release/README.txt
+        echo "" >> dist/release/README.txt
+        echo "服务器IP: 1.14.59.54" >> dist/release/README.txt
+        echo "端口: 3724 (登录), 8085 (游戏)" >> dist/release/README.txt
+        echo "注册: http://1.14.59.54:5000" >> dist/release/README.txt
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
