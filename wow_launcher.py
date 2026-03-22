@@ -47,16 +47,11 @@ class PatchManager:
     def fetch_manifest(self):
         """获取服务器补丁清单"""
         try:
-            # 使用鸽子命规范：patch-info.json
-            manifest_url = f"{self.patch_url}/patch-info.json"
+            # 使用鸽子命规范：manifest.json
+            manifest_url = f"{self.patch_url}/manifest.json"
             response = requests.get(manifest_url, timeout=10)
             if response.status_code == 200:
-                patch_info = response.json()
-                # 转换为统一的manifest格式
-                return {
-                    "version": patch_info.get("version", "0"),
-                    "patches": [patch_info] if patch_info.get("patch_file") else []
-                }
+                return response.json()
         except Exception as e:
             print(f"获取补丁清单失败: {e}")
         return None
@@ -75,7 +70,7 @@ class PatchManager:
         
         for patch in remote_manifest.get('patches', []):
             # 适配鸽子命格式
-            patch_name = patch.get('patch_file') or patch.get('name')
+            patch_name = patch.get('filename') or patch.get('name')
             patch_version = patch.get('version', '0')
             
             # 检查是否已安装
@@ -84,10 +79,11 @@ class PatchManager:
                 needed_patches.append({
                     'name': patch_name,
                     'version': patch_version,
-                    'download_url': patch.get('download_url'),
+                    'download_url': patch.get('url'),
                     'md5': patch.get('md5'),
-                    'size': patch.get('file_size'),
-                    'description': patch.get('description', '')
+                    'size': patch.get('size'),
+                    'description': patch.get('description', ''),
+                    'priority': patch.get('priority', 100)
                 })
             else:
                 # 检查版本号
@@ -96,11 +92,15 @@ class PatchManager:
                     needed_patches.append({
                         'name': patch_name,
                         'version': patch_version,
-                        'download_url': patch.get('download_url'),
+                        'download_url': patch.get('url'),
                         'md5': patch.get('md5'),
-                        'size': patch.get('file_size'),
-                        'description': patch.get('description', '')
+                        'size': patch.get('size'),
+                        'description': patch.get('description', ''),
+                        'priority': patch.get('priority', 100)
                     })
+        
+        # 按优先级排序
+        needed_patches.sort(key=lambda x: x.get('priority', 100), reverse=True)
         
         return remote_manifest, needed_patches
     
@@ -108,8 +108,11 @@ class PatchManager:
         """下载补丁文件"""
         try:
             patch_name = patch_info['name']
-            # 使用鸽子命规范的download_url
-            download_url = patch_info.get('download_url') or f"{self.patch_url}/patches/{patch_name}"
+            # 使用鸽子命规范的url字段
+            download_url = patch_info.get('download_url')
+            
+            if not download_url:
+                return False, "下载地址为空"
             
             # 临时文件路径
             temp_path = os.path.join(self.client_path, f".temp_{patch_name}")
@@ -137,7 +140,7 @@ class PatchManager:
                 calculated_md5 = self.calculate_md5(temp_path)
                 if calculated_md5 != md5_hash:
                     os.remove(temp_path)
-                    return False, "MD5校验失败"
+                    return False, f"MD5校验失败（期望:{md5_hash[:8]}... 实际:{calculated_md5[:8]}...）"
             
             # 应用补丁
             if progress_callback:
