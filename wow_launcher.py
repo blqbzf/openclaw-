@@ -1022,10 +1022,7 @@ class WoWLauncherV3_1:
             messagebox.showwarning("检测失败", result)
             return False
         else:
-            result += "✅ 未检测到外挂或非法脚本\n\n"
-            result += "✅ 客户端安全\n"
-            result += "✅ 可以正常游戏"
-            messagebox.showinfo("检测通过", result)
+            # 检测通过，不显示任何提示（符合用户要求）
             return True
     
     def launch_game_with_check(self):
