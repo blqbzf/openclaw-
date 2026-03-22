@@ -1,0 +1,39 @@
+{
+  "version": "1.0.5",
+  "release_date": "2026-03-22",
+  "changelog": "新增15件传说装备",
+  "patches": [
+    {
+      "name": "patch-ZP1.MPQ",
+      "version": "1.0.5",
+      "size": 315000,
+      "md5": "abc123def456",
+      "description": "自定义物品补丁",
+      "release_date": "2026-03-22",
+      "required": true
+    },
+    {
+      "name": "patch-ZP2.MPQ",
+      "version": "1.0.3",
+      "size": 128000,
+      "md5": "def789abc012",
+      "description": "机器人系统补丁",
+      "release_date": "2026-03-20",
+      "required": false
+    },
+    {
+      "name": "patch-ZP3.MPQ",
+      "version": "1.0.1",
+      "size": 64000,
+      "md5": "ghi345jkl678",
+      "description": "幻化系统补丁",
+      "release_date": "2026-03-18",
+      "required": false
+    }
+  ],
+  "server_info": {
+    "name": "P1时光WoW",
+    "version": "3.3.5a",
+    "website": "http://1.14.59.54"
+  }
+}
