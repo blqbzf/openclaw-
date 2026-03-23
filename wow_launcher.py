@@ -639,6 +639,7 @@ class WoWLauncherV3_1:
             ("📝 注册账号", self.open_register),
             ("🌐 访问官网", self.open_website),
             ("🔄 检查更新", self.check_for_updates_manual),
+            ("🔍 验证补丁", self.verify_patches),  # 新增
             ("🛡️ 安全检测", self.run_security_check),
             ("🗑️ 清除缓存", self.clear_cache),
         ]
@@ -1177,13 +1178,7 @@ class WoWLauncherV3_1:
             # 启动反作弊实时监控
             self.start_anti_cheat_monitor()
             
-            messagebox.showinfo(
-                "成功",
-                "✅ 安全检测通过！\n\n"
-                "游戏启动成功！\n"
-                "🛡️ 反作弊系统已启动实时监控\n"
-                "愿圣光与你同在！ ⚔️"
-            )
+            # 不显示成功弹窗（符合用户要求：只在发现问题时提示）
             
         except Exception as e:
             messagebox.showerror("错误", f"启动失败：\n{e}")
@@ -1298,6 +1293,63 @@ class WoWLauncherV3_1:
         except Exception as e:
             with open("launcher.log", 'a', encoding='utf-8') as f:
                 f.write(f"{datetime.now()}: 强制退出游戏失败 - {str(e)}\n")
+    
+    def verify_patches(self):
+        """验证补丁文件"""
+        client_path = self.path_entry.get().strip()
+        
+        if not client_path:
+            messagebox.showwarning("提示", "请先设置WoW客户端路径")
+            return
+        
+        data_path = os.path.join(client_path, "Data")
+        
+        if not os.path.exists(data_path):
+            messagebox.showerror("错误", f"Data目录不存在：\n{data_path}")
+            return
+        
+        # 查找所有patch-ZP开头的MPQ文件
+        patch_files = []
+        for file in os.listdir(data_path):
+            if file.startswith('patch-ZP') and file.endswith('.MPQ'):
+                file_path = os.path.join(data_path, file)
+                file_size = os.path.getsize(file_path)
+                patch_files.append({
+                    'name': file,
+                    'path': file_path,
+                    'size': file_size
+                })
+        
+        if not patch_files:
+            result = "❌ 未找到任何补丁文件！\n\n"
+            result += f"Data目录: {data_path}\n\n"
+            result += "请先运行'检查更新'下载补丁。"
+            messagebox.showwarning("验证结果", result)
+            return
+        
+        # 显示补丁文件信息
+        result = f"✅ 找到 {len(patch_files)} 个补丁文件\n\n"
+        result += f"Data目录: {data_path}\n\n"
+        result += "补丁文件列表：\n"
+        result += "━" * 40 + "\n"
+        
+        for patch in sorted(patch_files, key=lambda x: x['name']):
+            result += f"✓ {patch['name']}\n"
+            result += f"  大小: {patch['size']:,} bytes ({patch['size']/1024:.1f} KB)\n"
+            result += f"  路径: {patch['path']}\n\n"
+        
+        result += "━" * 40 + "\n"
+        result += "\n💡 提示：\n"
+        result += "• 如果补丁已存在但游戏未生效，可能是：\n"
+        result += "  1. 补丁文件本身有问题\n"
+        result += "  2. 需要删除Cache和WDB目录\n"
+        result += "  3. WoW客户端版本不匹配\n"
+        result += "\n建议操作：\n"
+        result += "• 删除Cache和WDB目录\n"
+        result += "• 重启游戏客户端\n"
+        result += "• 联系管理员检查补丁文件"
+        
+        messagebox.showinfo("补丁验证结果", result)
     
     def open_register(self):
         """打开注册页"""
