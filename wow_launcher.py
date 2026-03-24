@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-诺兰时光魔兽登录器 v3.1 - 增量补丁自动更新系统
+诺兰时光魔兽登录器 v3.3.1 - 增量补丁自动更新系统
 新增功能：自动检测、下载、应用补丁
 """
 
@@ -247,7 +247,7 @@ class PatchManager:
 class WoWLauncherV3_1:
     def __init__(self, root):
         self.root = root
-        self.root.title("诺兰时光魔兽 - 登录器")
+        self.root.title("诺兰时光魔兽 v3.3.1 - 登录器")
         
         # 窗口设置 - 异形窗口
         self.root.geometry("800x600")
@@ -429,7 +429,7 @@ class WoWLauncherV3_1:
         # 标题文字
         self.canvas.create_text(
             400, 50,
-            text="⚔️ 诺兰时光魔兽 ⚔️",
+            text="⚔️ 诺兰时光魔兽 v3.3.1 ⚔️",
             font=("华文行楷", 28, "bold"),
             fill="#ffd700"
         )
