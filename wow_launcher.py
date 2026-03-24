@@ -20,6 +20,25 @@ from datetime import datetime
 from pathlib import Path
 
 
+
+
+# 白名单进程（允许运行的合法软件）
+WHITELIST_PROCESSES = [
+    "chrome.exe",           # Google Chrome
+    "firefox.exe",         # Firefox浏览器
+    "wechat.exe",          # 微信
+    "qq.exe",              # QQ
+    "360safe.exe",         # 360安全卫士
+    "baidunetdisk.exe",    # 百度网盘
+    "thunder.exe",         # 迅雷
+    "bde.exe",             # 百度浏览器
+    "sogouexplorer.exe",   # 搜狗浏览器
+    "maxthon.exe",         # 傲游浏览器
+    "opera.exe",           # Opera浏览器
+    "edge.exe",            # Edge浏览器
+    "iexplore.exe",        # IE浏览器
+]
+
 class PatchManager:
     """补丁管理器"""
     
@@ -223,20 +242,6 @@ class PatchManager:
         local_version['last_check'] = datetime.now().isoformat()
         
         self.save_local_version(local_version)
-
-
-
-# 白名单进程（允许运行的合法软件）
-WHITELIST_PROCESSES = [
-    "chrome.exe",           # Google Chrome
-    "firefox.exe",         # Firefox浏览器
-    "wechat.exe",          # 微信
-    "qq.exe",              # QQ
-    "360safe.exe",         # 360安全卫士
-    "aliagent.exe",        # 阿里旺旺客户端助手
-    "baidunetdisk.exe",    # 百度网盘
-    "thunder.exe",         # 迅雷
-]
 
 
 class WoWLauncherV3_1:
@@ -988,58 +993,6 @@ class WoWLauncherV3_1:
         cheats_found = []
         
         # 常见WoW外挂进程名
-# 白名单进程（允许运行的合法软件）
-WHITELIST_PROCESSES = [
-    "chrome.exe",
-    "firefox.exe",
-    "wechat.exe",
-    "qq.exe",
-    "360safe.exe",
-    "baidunetdisk.exe",
-    "thunder.exe",
-    "bde.exe",
-    "sogouexplorer.exe",
-    "maxthon.exe",
-    "opera.exe",
-    "edge.exe",
-    "iexplore.exe",
-]
-
-        # 白名单进程（允许运行的合法软件）
-        WHITELIST_PROCESSES = [
-            "chrome.exe",           # Google Chrome
-            "firefox.exe",         # Firefox浏览器
-            "wechat.exe",          # 微信
-            "qq.exe",              # QQ
-            "360safe.exe",         # 360安全卫士
-            "baidunetdisk.exe",    # 百度网盘
-            "thunder.exe",         # 迅雷
-            "bde.exe",             # 百度浏览器
-            "sogouexplorer.exe",   # 搜狗浏览器
-            "maxthon.exe",         # 傲游浏览器
-            "opera.exe",           # Opera浏览器
-            "edge.exe",            # Edge浏览器
-            "iexplore.exe",        # IE浏览器
-        ]
-
-        cheat_processes = [
-        # 白名单进程（允许运行的合法软件）
-        WHITELIST_PROCESSES = [
-            "chrome.exe",           # Google Chrome
-            "firefox.exe",         # Firefox浏览器
-            "wechat.exe",          # 微信
-            "qq.exe",              # QQ
-            "360safe.exe",         # 360安全卫士
-            "baidunetdisk.exe",    # 百度网盘
-            "thunder.exe",         # 迅雷
-            "bde.exe",             # 百度浏览器
-            "sogouexplorer.exe",   # 搜狗浏览器
-            "maxthon.exe",         # 傲游浏览器
-            "opera.exe",           # Opera浏览器
-            "edge.exe",            # Edge浏览器
-            "iexplore.exe",        # IE浏览器
-        ]
-
         cheat_processes = [
             "WoWEmuHacker.exe",
             "WoWHack.exe",
@@ -1060,12 +1013,12 @@ WHITELIST_PROCESSES = [
             try:
                 proc_name = proc.info['name']
                 proc_lower = proc_name.lower()
-
-                # 检查是否在白名单中
+                
+                # 先检查白名单
                 if proc_lower in [p.lower() for p in WHITELIST_PROCESSES]:
                     continue  # 跳过白名单进程
-
-                # 检查是否是外挂
+                
+                # 再检查外挂列表
                 if proc_lower in [c.lower() for c in cheat_processes]:
                     cheats_found.append(f"进程: {proc_name}")
             except:
@@ -1092,12 +1045,6 @@ WHITELIST_PROCESSES = [
         
         return cheats_found
     
-
-    def get_whitelist_info(self):
-        """获取白名单信息"""
-        return "当前白名单进程：" + ", ".join(WHITELIST_PROCESSES)
-
-
     def check_scripts(self):
         """检测非法脚本"""
         scripts_found = []
