@@ -2,11 +2,11 @@ name: Build WoW Launcher
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, launcher-v1 ]
     tags:
       - v*
   pull_request:
-    branches: [ main ]
+    branches: [ main, launcher-v1 ]
   workflow_dispatch:
 
 permissions:
