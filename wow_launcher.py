@@ -37,6 +37,12 @@ WHITELIST_PROCESSES = [
     "opera.exe",           # Opera浏览器
     "edge.exe",            # Edge浏览器
     "iexplore.exe",        # IE浏览器
+    "eluna.exe",           # Eluna Lua引擎
+    "lua.exe",             # Lua解释器
+    "lua54.exe",           # Lua 5.4
+    "lua53.exe",           # Lua 5.3
+    "lua52.exe",           # Lua 5.2
+    "lua51.exe",           # Lua 5.1
 ]
 
 class PatchManager:
