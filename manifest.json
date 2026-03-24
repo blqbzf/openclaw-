@@ -1,39 +1,65 @@
 {
-  "version": "1.0.5",
-  "release_date": "2026-03-22",
-  "changelog": "新增15件传说装备",
+  "system_version": "1.3.0",
+  "last_updated": "2026-03-23T16:01:00Z",
   "patches": [
     {
-      "name": "patch-ZP1.MPQ",
-      "version": "1.0.5",
-      "size": 315000,
-      "md5": "abc123def456",
-      "description": "自定义物品补丁",
-      "release_date": "2026-03-22",
-      "required": true
+      "id": "patch-ZP1",
+      "version": "1.0.0",
+      "filename": "patch-ZP1.MPQ",
+      "url": "http://1.14.59.54:8080/patches/current/patch-ZP1.MPQ",
+      "size": 2048,
+      "md5": "a2e4118f2905922526227380cafef8f0",
+      "required": false,
+      "priority": 100,
+      "description": "时光行者坐骑图标补丁"
     },
     {
-      "name": "patch-ZP2.MPQ",
-      "version": "1.0.3",
-      "size": 128000,
-      "md5": "def789abc012",
-      "description": "机器人系统补丁",
-      "release_date": "2026-03-20",
-      "required": false
+      "id": "patch-ZP2",
+      "version": "1.0.0",
+      "filename": "patch-ZP2.MPQ",
+      "url": "http://1.14.59.54:8080/patches/current/patch-ZP2.MPQ",
+      "size": 4096,
+      "md5": "553b11e67369e0f7f12e0983e9cc6895",
+      "required": false,
+      "priority": 99,
+      "description": "诺兰时光界面基础补丁"
     },
     {
-      "name": "patch-ZP3.MPQ",
+      "id": "patch-ZP3",
       "version": "1.0.1",
-      "size": 64000,
-      "md5": "ghi345jkl678",
-      "description": "幻化系统补丁",
-      "release_date": "2026-03-18",
-      "required": false
+      "filename": "patch-ZP3.MPQ",
+      "url": "http://1.14.59.54:8080/patches/current/patch-ZP3.MPQ",
+      "size": 5856,
+      "md5": "5e6838a1dc732ba9747295a3a0dc51d2",
+      "required": false,
+      "priority": 98,
+      "description": "诺兰时光魔兽界面AddOn（基础版）"
+    },
+    {
+      "id": "patch-ZP4",
+      "version": "1.0.0",
+      "filename": "patch-ZP4.MPQ",
+      "url": "http://1.14.59.54:8080/patches/current/patch-ZP4.MPQ",
+      "size": 323584,
+      "md5": "9f2d438cf47de27a35bf7eac32efd53b",
+      "required": false,
+      "priority": 97,
+      "description": "诺兰时光魔兽完整界面补丁（316KB，包含AddOn）"
     }
   ],
+  "news": [
+    {
+      "id": "interface-update-v2",
+      "version": "1.3.0",
+      "title": "诺兰时光魔兽完整界面补丁发布",
+      "date": "2026-03-23",
+      "content": "完整的316KB MPQ补丁已发布！包含NolandTimeUI AddOn，自动修改登录界面和游戏界面。登陆器将自动下载更新。"
+    }
+  ],
+  "min_client_version": "3.3.5",
   "server_info": {
-    "name": "P1时光WoW",
-    "version": "3.3.5a",
-    "website": "http://1.14.59.54"
+    "name": "诺兰时光魔兽",
+    "realm": "1.14.59.54",
+    "port": 3724
   }
 }
