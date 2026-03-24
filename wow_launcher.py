@@ -995,9 +995,13 @@ class WoWLauncherV3_1:
         thread.start()
     
     def check_cheats(self):
-        """检测外挂和脚本"""
+        """检测外挂和脚本（临时禁用）"""
+        # 临时禁用外挂检测 - 直接返回空列表
+        return []
+
+        # 原检测代码（已禁用）
         cheats_found = []
-        
+
         # 常见WoW外挂进程名
         cheat_processes = [
             "WoWEmuHacker.exe",
@@ -1052,7 +1056,11 @@ class WoWLauncherV3_1:
         return cheats_found
     
     def check_scripts(self):
-        """检测非法脚本"""
+        """检测非法脚本（临时禁用）"""
+        # 临时禁用脚本检测 - 直接返回空列表
+        return []
+
+        # 原检测代码（已禁用）
         scripts_found = []
         
         client_path = self.path_entry.get().strip()
