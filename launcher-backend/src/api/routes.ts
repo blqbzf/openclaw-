@@ -51,6 +51,12 @@ app.get('/api/version', (req: Request, res: Response) => {
   });
 });
 
+// 巻加注册路由
+import { setupRegisterRoutes } from './register';
+
+setupRegisterRoutes(app);
+
+
 // 健康检查
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
