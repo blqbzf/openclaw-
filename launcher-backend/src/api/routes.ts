@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { LogManager } from '../utils/logger';
 import { ManifestService } from '../services/manifest-service';
 import { NewsService } from '../services/news-service';
+import { setupRegisterRoutes } from './register';
 
 const logger = LogManager.getLogger('api');
 const app = express();
@@ -19,27 +20,38 @@ app.use((req, res, next) => {
   next();
 });
 
-// API 路由
+// 注册路由
+setupRegisterRoutes(app);
+
+// Manifest API
 app.get('/api/manifest', async (req: Request, res: Response) => {
   try {
     const manifest = await ManifestService.getManifest();
     res.json(manifest);
   } catch (error) {
-    logger.error('Failed to get manifest:', error);
-    res.status(500).json({ success: false, message: 'Failed to get manifest' });
+    logger.error('Failed to get manifest', error);
+    res.status(500).json({
+      success: false,
+      message: '获取清单失败'
+    });
   }
 });
 
+// News API
 app.get('/api/news', async (req: Request, res: Response) => {
   try {
     const news = await NewsService.getNews();
     res.json(news);
   } catch (error) {
-    logger.error('Failed to get news:', error);
-    res.status(500).json({ success: false, message: 'Failed to get news' });
+    logger.error('Failed to get news', error);
+    res.status(500).json({
+      success: false,
+      message: '获取公告失败'
+    });
   }
 });
 
+// Version API
 app.get('/api/version', (req: Request, res: Response) => {
   res.json({
     success: true,
@@ -51,13 +63,7 @@ app.get('/api/version', (req: Request, res: Response) => {
   });
 });
 
-// 巻加注册路由
-import { setupRegisterRoutes } from './register';
-
-setupRegisterRoutes(app);
-
-
-// 健康检查
+// Health check
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });

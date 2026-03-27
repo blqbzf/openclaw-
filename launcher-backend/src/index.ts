@@ -1,9 +1,8 @@
 import express from 'express';
-import { setupRoutes } from './api/routes';
+import app from './api/routes';
 import { LogManager } from './utils/logger';
 
 const logger = LogManager.getLogger('server');
-const app = express();
 const PORT = process.env.PORT || 3001;
 
 // 中间件
@@ -17,9 +16,6 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-
-// 路由
-setupRoutes(app);
 
 // 错误处理
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -1,14 +1,14 @@
-import { Request, Response, Next } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { LogManager } from '../utils/logger';
 
 const logger = LogManager.getLogger('validator');
 
 // 用户名验证规则
 const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,16}$/;
-const PASSWORDRegex = /^[a-zA-Z0-9!@#$%^&*(){}]{6,}$/;
-const emailRegex = /^[^\s@]+@[?)+\.[^\s@]+\.[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^[a-zA-Z0-9!@#$%^&*(){}]{6,}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function validateRegister(req: Request, res: Response, next: any) {
+export function validateRegister(req: Request, res: Response, next: NextFunction) {
   const { username, password, email } = req.body;
 
   // 齐全性验证
@@ -41,14 +41,14 @@ export function validateRegister(req: Request, res: Response, next: any) {
     });
   }
 
-  if (!passwordRegex.test(password)) {
+  if (!PASSWORD_REGEX.test(password)) {
     return res.status(400).json({
       success: false,
       message: '密码必须 6-32 个字符，包含大小写字母、数字和特殊字符'
     });
   }
 
-  if (!emailRegex.test(email)) {
+  if (!EMAIL_REGEX.test(email)) {
     return res.status(400).json({
       success: false,
       message: '邮箱格式不正确'

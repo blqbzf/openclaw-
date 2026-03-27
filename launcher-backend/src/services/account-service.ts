@@ -25,7 +25,7 @@ export class AccountService {
       const [existing] = await connection.execute(
         'SELECT id FROM account WHERE username = ?',
         [data.username.toUpperCase()]
-      );
+      ) as any[];
 
       if (existing.length > 0) {
         return { success: false, message: '用户名已存在' };
@@ -38,7 +38,7 @@ export class AccountService {
       );
 
       // 插入新账号
-      const [result] = await connection.execute(
+      const result = await connection.execute(
         `INSERT INTO account 
          (username, salt, verifier, email, expansion, reg_mail)
          VALUES (?, ?, ?, ?, 2, ?)`,
@@ -49,7 +49,7 @@ export class AccountService {
           data.email || `${data.username.toLowerCase()}@nolan.wow`,
           data.email || `${data.username.toLowerCase()}@nolan.wow`
         ]
-      );
+      ) as any;
 
       const accountId = result.insertId;
 
@@ -84,7 +84,7 @@ export class AccountService {
       const [rows] = await connection.execute(
         'SELECT id FROM account WHERE username = ?',
         [username.toUpperCase()]
-      );
+      ) as any[];
 
       return rows.length === 0;
     } finally {
