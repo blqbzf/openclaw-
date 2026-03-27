@@ -1,0 +1,28 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="NolanWoWLauncher.App">
+    <Application.Styles>
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Light"
+                                       Accent="DodgerBlue"
+                                       AltHigh="White"
+                                       AltLow="White"
+                                       AltMedium="White"
+                                       AltMediumHigh="White"
+                                       AltMediumLow="White"
+                                       BaseHigh="White"
+                                       BaseLow="White"
+                                       BaseMedium="White"
+                                       BaseMediumHigh="White"
+                                       BaseMediumLow="White"
+                                       ChromeHigh="White"
+                                       ChromeLow="White"
+                                       ChromeMedium="White"
+                                       ChromeMediumLow="White"
+                                       ListLow="White"
+                                       ListMedium="White"/>
+            </FluentTheme.Palettes>
+        </FluentTheme>
+    </Application.Styles>
+</Application>
