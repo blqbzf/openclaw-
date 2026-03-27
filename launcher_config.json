@@ -1,0 +1,14 @@
+{
+  "server_name": "诺兰时光魔兽",
+  "server_ip": "1.14.59.54",
+  "realmlist": "set realmlist 1.14.59.54",
+  "client_path": "",
+  "register_url": "http://1.14.59.54:5000",
+  "website_url": "http://1.14.59.54",
+  "discord_url": "",
+  "patch_url": "http://1.14.59.54:8080",
+  "launcher_version": "3.5.6",
+  "game_version": "3.3.5a (12340)",
+  "news": "🎉 欢迎来到诺兰时光魔兽私服！\n\n✨ 服务器特色：\n• 机器人系统（单人也能玩！）\n• 幻化系统\n• 时光副本\n• 稳定运行\n\n📝 最新更新 v3.3.1：\n• 2026-03-24: 添加进程白名单\n• 优化反作弊检测\n• 减少误报\n• 提升玩家体验\n\n⚠️ 注意事项：\n• 请使用WoW 3.3.5a客户端\n• 首次登录需要先注册账号\n• 点击'注册账号'按钮注册\n• 有问题请联系管理员\n\n🎮 游戏愉快！",
+  "status_api": "http://1.14.59.54:5000/api/online"
+}
