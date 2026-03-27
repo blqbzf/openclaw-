@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "electron-vite --renderer",
     "build": "tsc",
-    "build:win": "npm run build && npx electron-builder --win --x64 --ia32 --publish never",
+    "build:win": "npm run build && npx electron-builder --win --x64 --publish never",
     "build:mac": "npm run build && npx electron-builder --mac --arm64 --publish never",
     "lint": "eslint src/** --ext .ts,.tsx",
     "test": "vitest"
