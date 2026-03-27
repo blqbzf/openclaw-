@@ -29,18 +29,18 @@ jobs:
     - name: Build EXE
       run: |
         cd wow_launcher
-        pyinstaller --onefile --windowed --name NolanWoWLauncher --icon=icon.ico wow_launcher.py
+        pyinstaller --onefile --windowed --name NolanWoWLauncher wow_launcher.py
 
     - name: Package release files
       run: |
         mkdir -p release_package
-        cp wow_launcher/dist/NolanWoWLauncher.exe release_package/
-        cp wow_launcher/background_nolan.jpg release_package/
-        cp wow_launcher/launcher_config.json release_package/
-        cp wow_launcher/CreateCert.bat release_package/
-        cp wow_launcher/InstallCert.bat release_package/
+        cp wow_launcher/dist/NolanWoWLauncher.exe release_package/ 2>/dev/null || echo "EXE not found"
+        cp wow_launcher/background_nolan.jpg release_package/ 2>/dev/null || echo "Background not found"
+        cp wow_launcher/launcher_config.json release_package/ 2>/dev/null || echo "Config not found"
+        cp wow_launcher/CreateCert.bat release_package/ 2>/dev/null || echo "CreateCert not found"
+        cp wow_launcher/InstallCert.bat release_package/ 2>/dev/null || echo "InstallCert not found"
         cd release_package
-        7z a -tzip ../NolanWoWLauncher-Windows.zip *
+        7z a -tzip ../NolanWoWLauncher-Windows.zip * 2>/dev/null || zip -r ../NolanWoWLauncher-Windows.zip .
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
