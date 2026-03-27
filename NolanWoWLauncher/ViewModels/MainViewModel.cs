@@ -52,10 +52,16 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task SelectClientDirectory()
+    private void SelectClient()
     {
         // 在视图中处理文件夹选择对话框
         StatusMessage = "请选择 WoW 客户端目录";
+    }
+    
+    [RelayCommand]
+    private void OpenRegisterDialog()
+    {
+        IsRegisterDialogOpen = true;
     }
 
     [RelayCommand]
