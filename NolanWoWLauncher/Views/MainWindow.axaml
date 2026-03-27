@@ -7,11 +7,12 @@
              mc:Ignorable="d"
              x:Class="NolanWoWLauncher.Views.MainWindow"
              MinWidth="800" MinHeight="450"
+             WindowStartupLocation="CenterScreen"
+             CanResize="False">
 
     <UserControl.Styles>
-        <Style Selector="^UserControl">
+        <Style Selector="UserControl">
             <Setter Property="Background" Value="{DynamicResource background.jpg}" />
-            <Setter Property="Stretch" Value="UniformToFill" />
         </Style>
     </UserControl.Styles>
 
