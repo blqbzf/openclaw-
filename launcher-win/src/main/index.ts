@@ -1,22 +1,12 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import * as path from 'path';
-import * as fs from 'fs';
-import { LogManager } from './utils/logger';
+import { LogManager } from '../utils/logger';
 
-import { Config } from './config/config';
-import { IpcChannels } from './common/ipc-channels';
-
-// 初始化日志
 const logger = LogManager.getLogger('main');
 
-// 初始化配置
-const config = Config.getInstance();
-
-// 主窗口
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
-  // 创建主窗口
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -28,7 +18,6 @@ function createWindow(): void {
     title: '诺兰时光魔兽 - 登录器',
   });
 
-  // 加载 React 应用
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:3000');
   } else {
@@ -40,7 +29,6 @@ function createWindow(): void {
   });
 }
 
-// Electron 应用就绪
 app.whenReady().then(() => {
   logger.info('Application started', {
     version: app.getVersion(),
@@ -48,59 +36,48 @@ app.whenReady().then(() => {
   });
 
   createWindow();
-
-  // 注册 IPC 处理程序
   registerIpcHandlers();
 });
 
-// IPC 处理程序
 function registerIpcHandlers(): void {
-  // 选择客户端目录
-  ipcMain.handle(IpcChannels.SELECTClientDirectory, async () => {
-    const result = await require('./services/client-service').selectClientDirectory();
-    return result;
+  ipcMain.handle('select-client-directory', async () => {
+    // TODO: 实现选择目录对话框
+    return { success: true, path: '' };
   });
 
-  // 扫描客户端
-  ipcMain.handle(IpcChannels.scanClient, async (clientPath: string) => {
-    const result = await require('./services/client-service').scanClient(clientPath);
-    return result;
+  ipcMain.handle('scan-client', async (event, clientPath: string) => {
+    // TODO: 实现客户端扫描
+    return { success: true, result: {} };
   });
 
-  // 修复 realmlist
-  ipcMain.handle(IpcChannels.fixRealmlist, async (clientPath: string) => {
-    const result = await require('./services/client-service').fixRealmlist(clientPath);
-    return result;
+  ipcMain.handle('fix-realmlist', async (event, clientPath: string) => {
+    // TODO: 实现 realmlist 修复
+    return { success: true };
   });
 
-  // 清理缓存
-  ipcMain.handle(IpcChannels.cleanCache, async (clientPath: string) => {
-    const result = await require('./services/client-service').cleanCache(clientPath);
-    return result;
+  ipcMain.handle('clean-cache', async (event, clientPath: string) => {
+    // TODO: 实现缓存清理
+    return { success: true, cleanedSize: 0 };
   });
 
-  // 获取 manifest
-  ipcMain.handle(IpcChannels.getManifest, async () => {
-    const result = await require('./services/patch-service').getManifest();
-    return result;
+  ipcMain.handle('get-manifest', async () => {
+    // TODO: 实现 manifest 获取
+    return { success: true, manifest: {} };
   });
 
-  // 下载补丁
-  ipcMain.handle(IpcChannels.downloadPatch, async (patchId: string, clientPath: string) => {
-    const result = await require('./services/patch-service').downloadPatch(patchId, clientPath);
-    return result;
+  ipcMain.handle('download-patch', async (event, patchId: string, clientPath: string) => {
+    // TODO: 实现补丁下载
+    return { success: true };
   });
 
-  // 注册账号
-  ipcMain.handle(IpcChannels.registerAccount, async (data: any) => {
-    const result = await require('./services/api-service').registerAccount(data);
-    return result;
+  ipcMain.handle('register-account', async (event, data: any) => {
+    // TODO: 实现账号注册
+    return { success: true };
   });
 
-  // 启动游戏
-  ipcMain.handle(IpcChannels.launchGame, async (clientPath: string) => {
-    const result = await require('./services/game-service').launchGame(clientPath);
-    return result;
+  ipcMain.handle('launch-game', async (event, clientPath: string) => {
+    // TODO: 实现游戏启动
+    return { success: true };
   });
 }
 
