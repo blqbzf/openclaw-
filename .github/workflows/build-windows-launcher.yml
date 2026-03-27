@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: Install dependencies
+      - name: Install dependencies for launcher-win
         run: |
           cd launcher-win
           npm install
