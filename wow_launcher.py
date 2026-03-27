@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-诺兰时光魔兽登录器 v3.5.7 - 修复登录失败问题
-修复：MD5校验失败时显示警告但不阻止启动
-优化：更好的用户体验
+诺兰时光魔兽登录器 v3.1 - 增量补丁自动更新系统
+新增功能：自动检测、下载、应用补丁
 """
 
 import tkinter as tk
@@ -17,7 +16,6 @@ import threading
 import time
 import requests
 import hashlib
-import base64
 from datetime import datetime
 from pathlib import Path
 
@@ -39,12 +37,6 @@ WHITELIST_PROCESSES = [
     "opera.exe",           # Opera浏览器
     "edge.exe",            # Edge浏览器
     "iexplore.exe",        # IE浏览器
-    "eluna.exe",           # Eluna Lua引擎
-    "lua.exe",             # Lua解释器
-    "lua54.exe",           # Lua 5.4
-    "lua53.exe",           # Lua 5.3
-    "lua52.exe",           # Lua 5.2
-    "lua51.exe",           # Lua 5.1
 ]
 
 class PatchManager:
@@ -78,7 +70,7 @@ class PatchManager:
             manifest_url = f"{self.patch_url}/manifest.json"
             print(f"[DEBUG] 正在获取: {manifest_url}")
             
-            response = requests.get(manifest_url, timeout=5)
+            response = requests.get(manifest_url, timeout=10)
             print(f"[DEBUG] 响应状态: {response.status_code}")
             
             if response.status_code == 200:
@@ -87,10 +79,6 @@ class PatchManager:
                 return data
             else:
                 print(f"[DEBUG] HTTP错误: {response.status_code}")
-        except requests.exceptions.Timeout:
-            print(f"[DEBUG] 连接超时：服务器响应慢或网络不稳定")
-        except requests.exceptions.ConnectionError as e:
-            print(f"[DEBUG] 连接失败：{e}")
         except Exception as e:
             print(f"[DEBUG] 获取补丁清单失败: {e}")
             import traceback
@@ -164,7 +152,6 @@ class PatchManager:
             
             # 下载文件
             response = requests.get(download_url, stream=True, timeout=30)
-            start_time = time.time()
             total_size = int(response.headers.get('content-length', 0))
             print(f"[DEBUG] 文件大小: {total_size} bytes ({total_size/1024:.1f} KB)")
             
@@ -177,18 +164,7 @@ class PatchManager:
                         downloaded += len(chunk)
                         if progress_callback and total_size > 0:
                             progress = int((downloaded / total_size) * 100)
-                            elapsed = max(time.time() - start_time, 0.1)
-                            speed = downloaded / elapsed
-                            remain = max(total_size - downloaded, 0)
-                            eta_seconds = int(remain / speed) if speed > 0 else 0
-                            eta_text = f"{eta_seconds // 60:02d}:{eta_seconds % 60:02d}"
-                            progress_callback(progress, {
-                                "text": f"下载中 {progress}%",
-                                "received": downloaded,
-                                "total": total_size,
-                                "speed": speed,
-                                "eta": eta_text,
-                            })
+                            progress_callback(progress, f"下载中 {progress}%")
             
             print(f"[DEBUG] 下载完成: {downloaded} bytes")
             
@@ -271,10 +247,10 @@ class PatchManager:
 class WoWLauncherV3_1:
     def __init__(self, root):
         self.root = root
-        self.root.title("诺兰时光魔兽登录器 v1.0.0")
+        self.root.title("诺兰时光魔兽 - 登录器")
         
         # 窗口设置 - 异形窗口
-        self.root.geometry("960x640")
+        self.root.geometry("800x600")
         self.root.resizable(False, False)
         self.root.overrideredirect(True)  # 无边框窗口
         
@@ -288,7 +264,7 @@ class WoWLauncherV3_1:
             bg_path = self.get_background_path()
             if os.path.exists(bg_path):
                 pil_image = Image.open(bg_path)
-                pil_image = pil_image.resize((960, 640), Image.Resampling.LANCZOS)
+                pil_image = pil_image.resize((800, 600), Image.Resampling.LANCZOS)
                 self.background_image = ImageTk.PhotoImage(pil_image)
         except:
             pass
@@ -300,9 +276,6 @@ class WoWLauncherV3_1:
         self.monitoring_active = False
         self.game_process = None
         self.monitor_thread = None
-        self.download_start_time = None
-        self.download_last_bytes = 0
-        self.expected_wow_md5 = self.config.get("wow_md5", "")
         
         # 创建魔兽风格UI
         self.create_wow_style_ui()
@@ -313,8 +286,8 @@ class WoWLauncherV3_1:
         # 绑定窗口拖动
         self.bind_window_drag()
         
-        # 延迟检查更新（5秒后，给网络初始化时间）
-        self.root.after(5000, self.check_for_updates_silent)
+        # 启动后检查更新
+        self.root.after(1000, self.check_for_updates_silent)
     
     def load_config(self):
         """加载配置"""
@@ -326,8 +299,7 @@ class WoWLauncherV3_1:
             "website_url": "",
             "client_path": "",
             "version": "3.3.5a",
-            "patch_url": "http://1.14.59.54:8080/patches",
-            "wow_md5": ""
+            "patch_url": "http://1.14.59.54:8080/patches"
         }
         
         if os.path.exists(config_file):
@@ -369,8 +341,8 @@ class WoWLauncherV3_1:
         # 主画布 - 用于绘制魔兽风格边框
         self.canvas = tk.Canvas(
             self.root,
-            width=960,
-            height=640,
+            width=800,
+            height=600,
             bg="#1a1a1a",
             highlightthickness=0
         )
@@ -382,8 +354,8 @@ class WoWLauncherV3_1:
             bg_path = self.get_background_path()
             if os.path.exists(bg_path):
                 pil_image = Image.open(bg_path)
-                # 调整大小为960x640
-                pil_image = pil_image.resize((960, 640), Image.Resampling.LANCZOS)
+                # 调整大小为800x600
+                pil_image = pil_image.resize((800, 600), Image.Resampling.LANCZOS)
                 self.background_photo = ImageTk.PhotoImage(pil_image)
                 # 在canvas上绘制背景
                 self.canvas.create_image(0, 0, anchor=tk.NW, image=self.background_photo)
@@ -403,9 +375,6 @@ class WoWLauncherV3_1:
             base_path = sys._MEIPASS
         else:
             base_path = os.path.dirname(os.path.abspath(__file__))
-        preferred = os.path.join(base_path, "background_nolan.jpg")
-        if os.path.exists(preferred):
-            return preferred
         return os.path.join(base_path, "background.jpg")
     
     def draw_wow_frame(self):
@@ -460,7 +429,7 @@ class WoWLauncherV3_1:
         # 标题文字
         self.canvas.create_text(
             400, 50,
-            text="⚔️ 诺兰时光魔兽登录器 ⚔️",
+            text="⚔️ 诺兰时光魔兽 ⚔️",
             font=("华文行楷", 28, "bold"),
             fill="#ffd700"
         )
@@ -512,9 +481,9 @@ class WoWLauncherV3_1:
     def create_content(self):
         """创建内容区域"""
         
-        # 左侧面板 - 公告区（深色半透明视觉）
-        left_frame = tk.Frame(self.root, bg="#0f0b14", bd=0, highlightthickness=1, highlightbackground="#6f4aa8")
-        left_frame.place(x=28, y=104, width=540, height=400)
+        # 左侧面板 - 公告区（半透明效果）
+        left_frame = tk.Frame(self.root, bg="#0a0a0a", bd=0)
+        left_frame.place(x=30, y=100, width=480, height=360)
         # 设置半透明效果（通过alpha）
         try:
             left_frame.attributes("-alpha", 0.7)
@@ -525,27 +494,26 @@ class WoWLauncherV3_1:
         tk.Label(
             left_frame,
             text="📜 服务器公告",
-            font=("微软雅黑", 14, "bold"),
-            fg="#f6deb0",
-            bg="#0f0b14",
+            font=("微软雅黑", 13, "bold"),
+            fg="#ffd700",
+            bg="#0a0a0a",
             bd=0
-        ).pack(anchor="w", padx=14, pady=(14,8))
+        ).pack(anchor="w", padx=10, pady=(10,5))
         
         # 公告内容
         news_text = tk.Text(
             left_frame,
-            font=("微软雅黑", 10),
-            bg="#0f0b14",
-            fg="#efe7f7",
+            font=("微软雅黑", 9),
+            bg="#0a0a0a",
+            fg="#e0e0e0",
             wrap="word",
             bd=0,
             highlightthickness=1,
-            highlightcolor="#8A2BE2",
-            highlightbackground="#3a2448",
-            insertbackground="#efe7f7",
-            height=20
+            highlightcolor="#c9a030",
+            highlightbackground="#3a3a3a",
+            height=18
         )
-        news_text.pack(fill="both", expand=True, padx=14, pady=(0,14))
+        news_text.pack(fill="both", expand=True, padx=10, pady=(0,10))
         
         news_content = """🎮 欢迎来到诺兰时光魔兽！
 
@@ -587,8 +555,8 @@ class WoWLauncherV3_1:
         news_text.config(state="disabled")
         
         # 右侧面板 - 功能区（半透明）
-        right_frame = tk.Frame(self.root, bg="#0f0b14", bd=0, highlightthickness=1, highlightbackground="#6f4aa8")
-        right_frame.place(x=590, y=104, width=342, height=400)
+        right_frame = tk.Frame(self.root, bg="#0a0a0a", bd=0)
+        right_frame.place(x=530, y=100, width=240, height=360)
         
         # 服务器状态
         status_frame = tk.LabelFrame(
@@ -783,9 +751,27 @@ class WoWLauncherV3_1:
                     messagebox.showinfo("成功", f"已自动找到客户端：\n{path}")
                     return
         
-        # 如果仍未找到，不进行驱动器搜索（太耗时）
-        # 让用户手动选择
-        pass
+        # 搜索所有驱动器
+        for drive in ['C:', 'D:', 'E:', 'F:']:
+            search_path = os.path.join(drive, "\\")
+            if os.path.exists(search_path):
+                # 简单搜索（避免耗时太长）
+                for root, dirs, files in os.walk(search_path):
+                    if "Wow.exe" in files:
+                        client_path = root
+                        self.path_entry.delete(0, tk.END)
+                        self.path_entry.insert(0, client_path)
+                        self.config["client_path"] = client_path
+                        self.save_config()
+                        self.init_patch_manager()
+                        messagebox.showinfo("成功", f"已自动找到客户端：\n{client_path}")
+                        return
+                    
+                    # 只搜索前3层目录
+                    if root.count('\\') > 3:
+                        del dirs[:]
+        
+        messagebox.showwarning("未找到", "未找到WoW客户端，请手动选择")
     
     def browse_client(self):
         """浏览选择客户端"""
@@ -828,7 +814,7 @@ class WoWLauncherV3_1:
             print(f"[DEBUG] 补丁管理器初始化失败")
             return
         
-        # 后台线程检查更新（带超时）
+        # 后台线程检查更新
         def check_thread():
             try:
                 print(f"[DEBUG] 开始检查更新...")
@@ -844,10 +830,6 @@ class WoWLauncherV3_1:
                     self.root.after(0, lambda: self.show_update_dialog(needed_patches, patch_names))
                 else:
                     print(f"[DEBUG] 无需更新")
-            except requests.exceptions.Timeout:
-                print(f"[DEBUG] 检查更新超时（服务器响应慢）")
-            except requests.exceptions.ConnectionError as e:
-                print(f"[DEBUG] 无法连接到补丁服务器: {e}")
             except Exception as e:
                 print(f"[DEBUG] 检查更新失败: {e}")
                 import traceback
@@ -917,7 +899,7 @@ class WoWLauncherV3_1:
         # 创建进度窗口
         progress_window = tk.Toplevel(self.root)
         progress_window.title("下载补丁")
-        progress_window.geometry("520x220")
+        progress_window.geometry("400x150")
         progress_window.resizable(False, False)
         
         tk.Label(
@@ -932,18 +914,10 @@ class WoWLauncherV3_1:
             font=("微软雅黑", 10)
         )
         progress_label.pack(pady=5)
-
-        detail_label = tk.Label(
-            progress_window,
-            text="已下载 0MB / 0MB  ·  速度 0KB/s  ·  剩余 --:--",
-            font=("微软雅黑", 10),
-            fg="#8A2BE2"
-        )
-        detail_label.pack(pady=2)
         
         progress_bar = ttk.Progressbar(
             progress_window,
-            length=430,
+            length=350,
             mode='determinate'
         )
         progress_bar.pack(pady=10)
@@ -961,13 +935,6 @@ class WoWLauncherV3_1:
                     def update_progress(percent, status):
                         progress_label.config(text=f"{patch_name}: {status}")
                         progress_bar['value'] = percent
-                        if isinstance(status, dict):
-                            received = status.get('received', 0)
-                            total = status.get('total', 0)
-                            speed = status.get('speed', 0)
-                            eta = status.get('eta', '--:--')
-                            progress_label.config(text=f"{patch_name}: {percent:.1f}%")
-                            detail_label.config(text=f"已下载 {self.format_bytes(received)} / {self.format_bytes(total)}  ·  速度 {self.format_bytes(speed)}/s  ·  剩余 {eta}")
                     
                     success, message = self.patch_manager.download_patch(
                         patch,
@@ -1022,13 +989,9 @@ class WoWLauncherV3_1:
         thread.start()
     
     def check_cheats(self):
-        """检测外挂和脚本（临时禁用）"""
-        # 临时禁用外挂检测 - 直接返回空列表
-        return []
-
-        # 原检测代码（已禁用）
+        """检测外挂和脚本"""
         cheats_found = []
-
+        
         # 常见WoW外挂进程名
         cheat_processes = [
             "WoWEmuHacker.exe",
@@ -1083,11 +1046,7 @@ class WoWLauncherV3_1:
         return cheats_found
     
     def check_scripts(self):
-        """检测非法脚本（临时禁用）"""
-        # 临时禁用脚本检测 - 直接返回空列表
-        return []
-
-        # 原检测代码（已禁用）
+        """检测非法脚本"""
         scripts_found = []
         
         client_path = self.path_entry.get().strip()
@@ -1180,9 +1139,9 @@ class WoWLauncherV3_1:
     
     def launch_game_with_check(self):
         """启动游戏（带安全检测）"""
-        # 先运行安全检测（不扫描 AddOns，仅检查外挂进程）
+        # 先运行安全检测
         cheats = self.check_cheats()
-        scripts = []
+        scripts = self.check_scripts()
         
         if cheats or scripts:
             error_msg = "❌ 检测到外挂或非法脚本！\n\n"
@@ -1215,38 +1174,19 @@ class WoWLauncherV3_1:
         if not os.path.exists(wow_exe):
             messagebox.showerror("错误", f"未找到Wow.exe：\n{wow_exe}")
             return
-
-        md5_ok, md5_info = self.verify_wow_md5(wow_exe)
-        if not md5_ok:
-            # MD5 校验失败，显示警告但允许继续
-            result = messagebox.askyesno(
-                "文件校验警告",
-                f"⚠️ Wow.exe 文件可能已被修改或损坏。\n\n"
-                f"当前 MD5: {md5_info}\n"
-                f"期望 MD5: {self.expected_wow_md5}\n\n"
-                f"这可能影响游戏体验。\n\n"
-                f"是否仍要继续启动游戏？",
-                icon="warning"
-            )
-            if not result:
-                return
         
-        # 检查更新（失败时跳过）
+        # 检查更新
         if self.patch_manager:
-            try:
-                manifest, needed_patches = self.patch_manager.check_for_updates()
-                if needed_patches:
-                    result = messagebox.askyesno(
-                        "发现新补丁",
-                        f"📦 发现 {len(needed_patches)} 个新补丁！\n\n建议先更新再启动游戏。\n\n是否立即更新？"
-                    )
-                    
-                    if result:
-                        self.download_and_install_patches(needed_patches)
-                        return
-            except Exception as e:
-                print(f"[DEBUG] 检查更新失败，跳过：{e}")
-                # 继续启动游戏，不阻塞
+            manifest, needed_patches = self.patch_manager.check_for_updates()
+            if needed_patches:
+                result = messagebox.askyesno(
+                    "发现新补丁",
+                    f"📦 发现 {len(needed_patches)} 个新补丁！\n\n建议先更新再启动游戏。\n\n是否立即更新？"
+                )
+                
+                if result:
+                    self.download_and_install_patches(needed_patches)
+                    return
         
         # 更新realmlist
         if not self.update_realmlist(client_path):
@@ -1256,7 +1196,6 @@ class WoWLauncherV3_1:
         try:
             os.chdir(client_path)
             self.game_process = subprocess.Popen([wow_exe])
-            self.root.protocol("WM_DELETE_WINDOW", self.on_app_closing)
             
             # 记录日志
             with open("launcher.log", 'a', encoding='utf-8') as f:
@@ -1438,69 +1377,13 @@ class WoWLauncherV3_1:
         
         messagebox.showinfo("补丁验证结果", result)
     
-    def compute_wow335_hash(self, username, password):
-        """计算 WoW 3.3.5 SRP6 账户哈希（SHA1(UPPER(user):UPPER(pass)))"""
-        raw = f"{username.strip().upper()}:{password.strip().upper()}".encode("utf-8")
-        return hashlib.sha1(raw).hexdigest().upper()
-
-    def format_bytes(self, num_bytes):
-        units = ['B', 'KB', 'MB', 'GB']
-        size = float(max(num_bytes, 0))
-        for unit in units:
-            if size < 1024 or unit == units[-1]:
-                return f"{size:.1f}{unit}"
-            size /= 1024
-
-    def verify_wow_md5(self, wow_exe):
-        if not self.expected_wow_md5:
-            return True, "未配置MD5，跳过校验"
-        actual = self.patch_manager.calculate_md5(wow_exe) if self.patch_manager else PatchManager('', os.path.dirname(wow_exe)).calculate_md5(wow_exe)
-        ok = actual.lower() == self.expected_wow_md5.lower()
-        return ok, actual
-
-    def kill_all_wow_processes(self):
-        for proc in psutil.process_iter(['pid', 'name']):
-            try:
-                if proc.info['name'] and 'wow.exe' in proc.info['name'].lower():
-                    proc.kill()
-            except:
-                pass
-
-    def on_app_closing(self):
-        self.monitoring_active = False
-        self.kill_all_wow_processes()
-        self.root.destroy()
-
     def open_register(self):
-        """打开注册页，同时弹出 3.3.5 哈希辅助工具"""
-        dialog = tk.Toplevel(self.root)
-        dialog.title("3.3.5 账号注册辅助")
-        dialog.geometry("420x260")
-        dialog.configure(bg="#151015")
-        dialog.resizable(False, False)
-
-        tk.Label(dialog, text="账号", font=("微软雅黑", 11), fg="#f5e6c8", bg="#151015").pack(pady=(18, 4))
-        user_entry = tk.Entry(dialog, font=("微软雅黑", 11), width=30)
-        user_entry.pack()
-        tk.Label(dialog, text="密码", font=("微软雅黑", 11), fg="#f5e6c8", bg="#151015").pack(pady=(12, 4))
-        pass_entry = tk.Entry(dialog, font=("微软雅黑", 11), width=30, show="*")
-        pass_entry.pack()
-        result_var = tk.StringVar(value="SHA1 哈希将在这里显示")
-        tk.Label(dialog, textvariable=result_var, font=("Consolas", 10), wraplength=360, fg="#d8c7ff", bg="#151015").pack(pady=14)
-
-        def build_hash():
-            u = user_entry.get().strip()
-            p = pass_entry.get().strip()
-            if not u or not p:
-                result_var.set("请输入账号和密码")
-                return
-            result_var.set(self.compute_wow335_hash(u, p))
-
-        tk.Button(dialog, text="生成 3.3.5 SHA1", command=build_hash, bg="#8A2BE2", fg="white", bd=0, padx=16, pady=6).pack()
-
+        """打开注册页"""
         import webbrowser
         if self.config.get("register_url"):
             webbrowser.open(self.config["register_url"])
+        else:
+            messagebox.showinfo("提示", "请联系管理员获取注册地址")
     
     def open_website(self):
         """打开官网"""
@@ -1548,7 +1431,6 @@ def main():
         pass
     
     app = WoWLauncherV3_1(root)
-    root.protocol("WM_DELETE_WINDOW", app.on_app_closing)
     
     # 居中窗口
     root.update_idletasks()
