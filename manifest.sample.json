@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-27T00:00:00Z",
+  "serverInfo": {
+    "name": "诺兰时光魔兽",
+    "realm": "1.14.59.54",
+    "port": 3724
+  },
+  "requiredFiles": [
+    "Wow.exe",
+    "realmlist.wtf"
+  ],
+  "allowedPatterns": [
+    "*.MPQ",
+    "*.mpq"
+  ],
+  "patches": [],
+  "realmlist": {
+    "content": "set realmlist 1.14.59.54",
+    "required": true
+  },
+  "news": [
+    {
+      "id": "welcome",
+      "title": "欢迎来到诺兰时光魔兽",
+      "content": "全新服务器，更多精彩内容等你探索",
+      "date": "2026-03-27",
+      "important": true
+    }
+  ],
+  "minClientVersion": "3.3.5a",
+  "maxClientVersion": "3.3.5a"
+}
