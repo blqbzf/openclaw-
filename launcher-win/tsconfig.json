@@ -1,0 +1,10 @@
+name: "wow-launcher"
+version: 1.0.0
+description: WoW 3.3.5a 私服登录器
+main: dist/index.js
+scripts:
+  dev: electron-vite --renderer
+  build: tsc && electron-builder
+  lint: eslint src/** --ext .ts,.tsx
+  preview: vite preview
+  test: vitest

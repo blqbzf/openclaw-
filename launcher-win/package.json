@@ -1,0 +1,83 @@
+{
+  "name": "wow-launcher",
+  "version": "1.0.0",
+  "description": "WoW 3.3.5a 租服登录器",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "electron-vite --renderer",
+    "build": "tsc && electron-builder",
+    "lint": "eslint src/** --ext .ts,.tsx",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "sha.js": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/electron": "^28.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "electron-builder": "^24.0.0",
+    "typescript": "^5.0.0"
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "build": {
+    "appId": "com.nolanwow.launcher",
+    "productName": "诺兰时光WoW登录器",
+    "directories": {
+      "output": "dist/win-unpacked"
+      "buildResources": {
+        "from": {
+          "config": "vite.config.ts",
+          "data": [
+            "public/**"
+          "src/**"
+          "build/**"
+            "!src/**/*.{ts,tsx}",
+            "!src/**/*.{tsx,tsx}",
+            "!src/**/*.js",
+            "!src/**/*.d.ts"
+          ]
+        },
+        "to": "dist"
+      }
+    },
+    "files": [
+      "from": "package.json",
+      "to": "dist/resources/"
+    },
+    "extraResources": {
+      "from": "public",
+      "to": "dist/resources"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        ],
+        "artifactName": "${productName}-${version}-${arch}.${exe`,
+        "electronDownload": {
+        "mirror": "github.com/electron-userland/electron-builder-binaries/${version}/${arch}"
+      }
+    },
+    "nsis": {
+      "oneClick": false
+      "perMachineInstall": false
+      "deleteAppDataOnUninstall": true,
+      "run eslint fix"
+      "createDesktopShortcut": true
+    }
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "blqbzf",
+    "repo": "openclaw-"
+  }
+}
