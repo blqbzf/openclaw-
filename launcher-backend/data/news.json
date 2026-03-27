@@ -1,0 +1,18 @@
+{
+  "news": [
+    {
+      "id": "welcome",
+      "title": "欢迎来到诺兰时光魔兽",
+      "content": "全新服务器，更多精彩内容等你探索。 支持自动补丁更新、一键启动游戏。",
+      "date": "2026-03-27",
+      "author": "管理员"
+    },
+    {
+      "id": "launcher-release",
+      "title": "登录器 v1.0.0 发布",
+      "content": "全新登录器正式发布，基于 Electron + React + TypeScript 构建。 支持自动扫描客户端、补丁下载、缓存清理等完整功能。",
+      "date": "2026-03-27",
+      "author": "管理员"
+    }
+  ]
+}
