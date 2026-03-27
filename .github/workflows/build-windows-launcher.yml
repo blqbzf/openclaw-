@@ -21,7 +21,7 @@ jobs:
       - name: Build launcher-win
         run: |
           cd launcher-win
-          npm ci
+          npm install
           npm run build:win
 
       - name: Upload Windows Artifact
