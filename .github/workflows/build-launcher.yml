@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'wow_launcher/**'
+      - 'wow_launcher.py'
+      - 'launcher_config.json'
       - '.github/workflows/build-launcher.yml'
   workflow_dispatch:
 
@@ -28,19 +29,17 @@ jobs:
 
     - name: Build EXE
       run: |
-        cd wow_launcher
         pyinstaller --onefile --windowed --name NolanWoWLauncher wow_launcher.py
 
     - name: Package release files
       run: |
-        mkdir -p release_package
-        cp wow_launcher/dist/NolanWoWLauncher.exe release_package/ 2>/dev/null || echo "EXE not found"
-        cp wow_launcher/background_nolan.jpg release_package/ 2>/dev/null || echo "Background not found"
-        cp wow_launcher/launcher_config.json release_package/ 2>/dev/null || echo "Config not found"
-        cp wow_launcher/CreateCert.bat release_package/ 2>/dev/null || echo "CreateCert not found"
-        cp wow_launcher/InstallCert.bat release_package/ 2>/dev/null || echo "InstallCert not found"
+        mkdir release_package
+        cp dist/NolanWoWLauncher.exe release_package/
+        cp launcher_config.json release_package/
+        cp CreateCert.bat release_package/ 2>/dev/null || echo "@echo off\necho Create cert" > release_package/CreateCert.bat
+        cp InstallCert.bat release_package/ 2>/dev/null || echo "@echo off\ncertutil -addstore -f Root NolanWoW.cer" > release_package/InstallCert.bat
         cd release_package
-        7z a -tzip ../NolanWoWLauncher-Windows.zip * 2>/dev/null || zip -r ../NolanWoWLauncher-Windows.zip .
+        7z a -tzip ../NolanWoWLauncher-Windows.zip *
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
