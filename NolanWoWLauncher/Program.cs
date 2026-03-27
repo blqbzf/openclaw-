@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Logging.Serilog;
 using NolanWoWLauncher.Views;
 
 namespace NolanWoWLauncher;
