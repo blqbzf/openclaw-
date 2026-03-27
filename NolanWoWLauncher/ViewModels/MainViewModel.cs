@@ -179,12 +179,6 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenRegisterDialog()
-    {
-        IsRegisterDialogOpen = true;
-    }
-
-    [RelayCommand]
     private async Task Register()
     {
         if (string.IsNullOrWhiteSpace(RegisterUsername) || string.IsNullOrWhiteSpace(RegisterPassword))
