@@ -7,7 +7,8 @@
 """
 
 import tkinter as tk
-from tkinter import messagebox, filedialog, import os
+from tkinter import messagebox, filedialog
+import os
 import subprocess
 import json
 import requests
