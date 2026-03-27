@@ -14,7 +14,7 @@ import json
 class SimpleWoWLauncher:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("诺兰时光魔兽登录器 v3.6")
+        self.root.title("诺兰时光魔兽登录器 v3.6.1")
         self.root.geometry("800x600")
         self.root.configure(bg="#1a1a2e")
         
@@ -23,23 +23,33 @@ class SimpleWoWLauncher:
         
         # 创建界面
         self.create_widgets()
+        
+        # 不检查更新，直接启动
+        # 不连接服务器，避免卡顿
     
     def load_config(self):
         """加载配置文件"""
         config_file = os.path.join(os.path.dirname(__file__), "launcher_config.json")
         try:
-            with open(config_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            # 默认配置
-            return {
-                "server_name": "诺兰时光魔兽",
-                "server_ip": "1.14.59.54",
-                "realmlist": "set realmlist 1.14.59.54",
-                "client_path": "",
-                "register_url": "http://1.14.59.54:5000",
-                "launcher_version": "3.6.0"
-            }
+            if os.path.exists(config_file):
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    self.config = json.load(f)
+                    print(f"[INFO] 配置加载成功: {config_file}")
+            else:
+                print(f"[WARN] 配置文件不存在: {config_file}")
+        except Exception as e:
+            print(f"[ERROR] 加载配置失败: {e}")
+            messagebox.showerror("配置错误", f"无法加载配置文件:\n{str(e)}\n\n请检查 launcher_config.json 文件")
+        
+        # 默认配置
+        return {
+            "server_name": "诺兰时光魔兽",
+            "server_ip": "1.14.59.54",
+            "realmlist": "set realmlist 1.14.59.54",
+            "client_path": "",
+            "register_url": "http://1.14.59.54:5000",
+            "launcher_version": "3.6.0"
+        }
     
     def create_widgets(self):
         """创建界面组件"""
