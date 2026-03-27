@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-诺兰时光魔兽登录器 v3.8 - 宙美增强版
+诺兰时光魔兽登录器 v3.3.8 - 宙美增强版
 基于 v3.3.1 恢复 MD5 检测
  保留补丁下载
 """
@@ -151,7 +151,7 @@ class PatchManager:
 class WoWLauncher:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("诺兰时光魔兽登录器 v3.8")
+        self.root.title("诺兰时光魔兽登录器 v3.3.8")
         self.root.geometry("900x700")
         self.root.configure(bg="#1a1a2e")
         self.root.resizable(False, False, False, False)
