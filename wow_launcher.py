@@ -9,6 +9,7 @@
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import os
+import sys
 import subprocess
 import json
 import requests
@@ -163,13 +164,21 @@ class WoWLauncher:
     
     def load_config(self):
         """加载配置文件"""
-        config_file = os.path.join(os.path.dirname(__file__), "launcher_config.json")
+        # PyInstaller 打包后的路径处理
+        if getattr(sys, 'frozen', False):
+            # 打包后的exe所在目录
+            app_dir = os.path.dirname(sys.executable)
+        else:
+            # 开发环境
+            app_dir = os.path.dirname(__file__)
+        
+        config_file = os.path.join(app_dir, "launcher_config.json")
         if os.path.exists(config_file):
             with open(config_file, 'r', encoding='utf-8') as f:
-                self.config = json.load(f)
+                return json.load(f)
         else:
             # 默认配置
-            self.config = {
+            return {
                 "server_name": "诺兰时光魔兽",
                 "server_ip": "1.14.59.54",
                 "realmlist": "set realmlist 1.14.59.54",
