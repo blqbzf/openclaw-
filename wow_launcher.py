@@ -101,7 +101,7 @@ class PatchManager:
                     os.rename(tmp_file, final_path)
                     return True, None
         except Exception as e:
-                    return False, str(e)
+            return False, str(e)
 
 
     
