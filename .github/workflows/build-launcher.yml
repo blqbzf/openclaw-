@@ -34,12 +34,13 @@ jobs:
     - name: Package release files
       run: |
         mkdir release_package
-        cp dist/NolanWoWLauncher.exe release_package/
-        cp launcher_config.json release_package/
-        cp CreateCert.bat release_package/ 2>/dev/null || echo "@echo off\necho Create cert" > release_package/CreateCert.bat
-        cp InstallCert.bat release_package/ 2>/dev/null || echo "@echo off\ncertutil -addstore -f Root NolanWoW.cer" > release_package/InstallCert.bat
+        copy dist\NolanWoWLauncher.exe release_package\
+        copy launcher_config.json release_package\
+        copy CreateCert.bat release_package\
+        copy InstallCert.bat release_package\
         cd release_package
-        7z a -tzip ../NolanWoWLauncher-Windows.zip *
+        7z a -tzip ..\NolanWoWLauncher-Windows.zip *
+      shell: cmd
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
