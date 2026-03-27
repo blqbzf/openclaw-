@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-诺兰时光魔兽登录器 v3.5.6 - 修复登录失败问题
+诺兰时光魔兽登录器 v3.5.7 - 修复登录失败问题
 修复：MD5校验失败时显示警告但不阻止启动
 优化：更好的用户体验
 """
@@ -1220,8 +1220,12 @@ class WoWLauncherV3_1:
         if not md5_ok:
             # MD5 校验失败，显示警告但允许继续
             result = messagebox.askyesno(
-                "文件校验失败",
-                f"Wow.exe 文件可能已被修改或损坏。\n\n当前 MD5: {md5_info}\n\n这可能影响游戏体验或建议重新下载客户端。\n\n是否仍要继续启动？",
+                "文件校验警告",
+                f"⚠️ Wow.exe 文件可能已被修改或损坏。\n\n"
+                f"当前 MD5: {md5_info}\n"
+                f"期望 MD5: {self.expected_wow_md5}\n\n"
+                f"这可能影响游戏体验。\n\n"
+                f"是否仍要继续启动游戏？",
                 icon="warning"
             )
             if not result:
