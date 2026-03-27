@@ -1,47 +1,54 @@
 name: Build Windows Launcher
+
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    types: [opened, ready, review-approved]
-  schedule:
-    - cron: '0 0 * * * *' # 每天检查更新
-    - name: Check for updates
-      run: git pull origin main
+    branches: [ main, feat/wow-launcher ]
+  workflow_dispatch: # 允许手动触发
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
-    - name: Install dependencies
-      run: |
-        cd launcher-win
-        npm install
-        cd ../launcher-backend
-        npm install
-    - name: Build Backend
-      run: |
-        cd launcher-backend
-        npm run build
-    - name: Build Windows Launcher
-      run: |
-        cd launcher-win
-        npm run build:win
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: NolanWoWLauncher-Windows
-        path: launcher-win/dist/NolanWoWLauncher Setup.exe
-        retention-days: 30
-    - name: Create Release
-      if: github.event_name == 'push'
-      needs:
-        github_token: true
-      runs: |
-        gh release create ${{ github.ref }} \
-          --draft \
-          --title "v${{ github.run.number }}" \
-          --notes "Automated build from commit ${{ github.sha }}" \
-          NolanWoWLauncher-Windows.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: |
+          cd launcher-win
+          npm install
+          cd ../launcher-backend
+          npm install
+
+      - name: Build Backend
+        run: |
+          cd launcher-backend
+          npm run build
+
+      - name: Build Windows Launcher
+        run: |
+          cd launcher-win
+          npm run build:win
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: NolanWoWLauncher-Windows
+          path: launcher-win/dist/
+          retention-days: 30
+
+      - name: Create Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          gh release create v1.0.0-${{ github.run_number }} \
+            --draft \
+            --title "Build ${{ github.run.number }}" \
+            --notes "Automated build from ${{ github.sha }}" \
+            launcher-win/dist/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
