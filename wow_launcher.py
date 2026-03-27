@@ -1,238 +1,150 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-诺兰时光魔兽登录器 v3.6.1 - 超级极简版
-完全移除所有可能导致卡顿的功能
-"""
+诺兰时光魔兽登录器 v3.7 - 极简智能版
+基于 v3.3.1 緻加自动补丁功能
+无启动卡顿，"""
 
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import os
 import subprocess
 import json
-import sys
+import requests
+import threading
+import hashlib
 
-class UltraSimpleWoWLauncher:
-    def __init__(self):
+class PatchManager:
+    """补丁管理器"""
+    
+    def __init__(self, patch_url, client_path):
+        self.patch_url = patch_url
+        self.client_path = client_path
+        self.data_path = os.path.join(client_path, "Data")
+        self.local_version_file = os.path.join(client_path, ".patch_version.json")
+    
+    def fetch_manifest(self):
+        """获取服务器补丁清单"""
         try:
-            self.root = tk.Tk()
-            self.root.title("诺兰时光魔兽 v3.6.1")
-            self.root.geometry("800x600")
-            self.root.configure(bg="#1a1a2e")
+            manifest_url = f"{self.patch_url}/manifest.json"
+            response = requests.get(manifest_url, timeout=5)
+            if response.status_code == 200:
+                return response.json()
+        except:
+            return None
+    
+    def check_for_updates(self):
+        """检查需要的补丁"""
+        remote_manifest = self.fetch_manifest()
+        if not remote_manifest:
+            return None, []
+        
+        # 获取本地版本
+        local_version = self.get_local_version()
+        local_patches = {p['name']: p for p in local_version.get('patches', [])}
+        
+        # 找出需要更新的补丁
+        needed_patches = []
+        for patch in remote_manifest.get('patches', []):
+            patch_name = patch.get('name')
+            remote_version = patch.get('version')
             
-            # 加载配置
-            self.config = self.load_config()
-            
-            # 创建界面
-            self.create_widgets()
-            
-            print("[INFO] 登录器已启动")
-        except Exception as e:
-            print(f"[FATAL] 启动失败: {e}")
-            sys.exit(1)
-    
-    def load_config(self):
-        """加载配置文件"""
-        config = {
-            "server_name": "诺兰时光魔兽",
-            "server_ip": "1.14.59.54",
-            "realmlist": "set realmlist 1.14.59.54",
-            "client_path": "",
-            "register_url": "http://1.14.59.54:5000",
-            "launcher_version": "3.6.1"
-        }
+            if patch_name not in local_patches:
+                needed_patches.append(patch)
+            elif local_patches[patch_name] != remote_version:
+                needed_patches.append(patch)
         
+        return remote_manifest, needed_patches
+    
+    def get_local_version(self):
+        """获取本地补丁版本"""
+        if os.path.exists(self.local_version_file):
+            try:
+                with open(self.local_version_file, 'r') as f:
+                    return json.load(f)
+            except:
+                return {"patches": [], "version": "0"}
+        return {"patches": [], "version": "0"}
+    
+    def save_local_version(self, version_info):
+        """保存本地补丁版本"""
+        with open(self.local_version_file, 'w') as f:
+            json.dump(version_info, f, ensure_ascii=False, indent=2)
+    
+    def download_patch(self, patch_info, progress_window=None):
+        """下载补丁"""
         try:
-            config_file = "launcher_config.json"
-            if os.path.exists(config_file):
-                with open(config_file, 'r', encoding='utf-8') as f:
-                    loaded = json.load(f)
-                    config.update(loaded)
-                    print(f"[INFO] 配置加载成功")
+                patch_url = patch_info.get('url')
+            patch_name = patch_info.get('name')
+                patch_size = patch_info.get('size')
+                
+                # 创建临时文件
+                tmp_file = os.path.join(self.client_path, f"{patch_name}.tmp")
+                
+                # 下载
+                response = requests.get(patch_url, stream=True)
+                with open(tmp_file, 'wb') as f:
+                    for chunk in response.iter_content(chunk):
+                        f.write(chunk)
+                        
+                        # 计算进度
+                        downloaded = os.path.getsize(tmp_file)
+                        percent = (downloaded / patch_size) * 100
+                        
+                        if progress_window:
+                            progress_window.update_progress(percent)
+                
+                # 移动到最终位置
+                final_path = os.path.join(self.data_path, patch_name)
+                if os.path.exists(tmp_file):
+                    os.rename(tmp_file, final_path)
+                    return True, None
         except Exception as e:
-            print(f"[WARN] 配置加载失败，使用默认配置: {e}")
-        
-        return config
-    
-    def create_widgets(self):
-        """创建界面组件"""
-        # 标题
-        title_label = tk.Label(
-            self.root,
-            text=f"🎮 {self.config.get('server_name', '诺兰时光魔兽')}",
-            font=("微软雅黑", 32, "bold"),
-            fg="#FFD700",
-            bg="#1a1a2e"
-        )
-        title_label.pack(pady=50)
-        
-        # 服务器信息
-        info_frame = tk.Frame(self.root, bg="#1a1a2e")
-        info_frame.pack(pady=20)
-        
-        tk.Label(
-            info_frame,
-            text=f"服务器: {self.config.get('server_ip', '1.14.59.54')}",
-            font=("微软雅黑", 14),
-            fg="#FFD700",
-            bg="#1a1a2e"
-        ).pack()
-        
-        tk.Label(
-            info_frame,
-            text=f"版本: 3.3.5a (12340)",
-            font=("微软雅黑", 12),
-            fg="#999",
-            bg="#1a1a2e"
-        ).pack()
-        
-        # 客户端路径
-        path_frame = tk.Frame(self.root, bg="#1a1a2e")
-        path_frame.pack(pady=30)
-        
-        tk.Label(
-            path_frame,
-            text="客户端路径:",
-            font=("微软雅黑", 12),
-            fg="#FFD700",
-            bg="#1a1a2e"
-        ).pack(side=tk.LEFT, padx=5)
-        
-        self.path_entry = tk.Entry(
-            path_frame,
-            width=50,
-            font=("微软雅黑", 10),
-            bg="#0a0a14",
-            fg="#E0E0E0",
-            insertbackground="#FFD700"
-        )
-        self.path_entry.pack(side=tk.LEFT, padx=5)
-        self.path_entry.insert(0, self.config.get("client_path", ""))
-        
-        browse_btn = tk.Button(
-            path_frame,
-            text="浏览",
-            font=("微软雅黑", 10),
-            bg="#8B4513",
-            fg="#FFD700",
-            command=self.browse_path
-        )
-        browse_btn.pack(side=tk.LEFT, padx=5)
-        
-        # 按钮区域
-        button_frame = tk.Frame(self.root, bg="#1a1a2e")
-        button_frame.pack(pady=30)
-        
-        # 开始游戏按钮
-        start_btn = tk.Button(
-            button_frame,
-            text="🎮 开始游戏",
-            font=("微软雅黑", 14, "bold"),
-            bg="#8B4513",
-            fg="#FFD700",
-            width=15,
-            height=2,
-            command=self.start_game
-        )
-        start_btn.pack(pady=10)
-        
-        # 注册账号按钮
-        register_btn = tk.Button(
-            button_frame,
-            text="📝 注册账号",
-            font=("微软雅黑", 12),
-            bg="#4a3a6a",
-            fg="#FFD700",
-            width=15,
-            command=self.open_register
-        )
-        register_btn.pack(pady=5)
-        
-        # 状态标签
-        self.status_label = tk.Label(
-            self.root,
-            text="就绪",
-            font=("微软雅黑", 10),
-            fg="#999",
-            bg="#1a1a2e"
-        )
-        self.status_label.pack(side=tk.BOTTOM, pady=20)
-    
-    def browse_path(self):
-        """浏览选择客户端路径"""
-        path = filedialog.askdirectory(title="选择WoW客户端目录")
-        if path:
-            self.path_entry.delete(0, tk.END)
-            self.path_entry.insert(0, path)
-            self.config["client_path"] = path
-            self.save_config()
-    
-    def save_config(self):
-        """保存配置"""
-        try:
-            with open("launcher_config.json", 'w', encoding='utf-8') as f:
-                json.dump(self.config, f, indent=2, ensure_ascii=False)
-        except Exception as e:
-            print(f"[WARN] 保存配置失败: {e}")
-    
-    def start_game(self):
-        """启动游戏"""
-        client_path = self.path_entry.get().strip()
-        
-        if not client_path:
-            messagebox.showwarning("提示", "请先选择WoW客户端路径")
-            return
-        
-        wow_exe = os.path.join(client_path, "Wow.exe")
-        
-        if not os.path.exists(wow_exe):
-            messagebox.showerror("错误", f"未找到Wow.exe:\n{wow_exe}")
-            return
-        
-        # 更新 realmlist
-        realmlist_file = os.path.join(client_path, "realmlist.wtf")
-        try:
-            with open(realmlist_file, 'w', encoding='utf-8') as f:
-                f.write(self.config.get("realmlist", "set realmlist 1.14.59.54"))
-            print(f"[INFO] realmlist 已更新")
-        except Exception as e:
-            print(f"[WARN] 更新realmlist失败: {e}")
-            messagebox.showwarning("警告", f"更新realmlist失败:\n{e}")
-        
-        # 启动游戏
-        try:
-            os.chdir(client_path)
-            subprocess.Popen([wow_exe])
-            self.status_label.config(text="游戏已启动")
-            print(f"[INFO] 游戏已启动: {wow_exe}")
-            messagebox.showinfo("成功", "游戏启动成功！\n\n请等待游戏加载...")
-        except Exception as e:
-            print(f"[ERROR] 启动游戏失败: {e}")
-            messagebox.showerror("错误", f"启动游戏失败:\n{e}")
-    
-    def open_register(self):
-        """打开注册页面"""
-        try:
-            import webbrowser
-            url = self.config.get("register_url", "http://1.14.59.54:5000")
-            webbrowser.open(url)
-            print(f"[INFO] 已打开注册页面: {url}")
-        except Exception as e:
-            print(f"[ERROR] 打开注册页面失败: {e}")
-    
-    def run(self):
-        """运行登录器"""
-        try:
-            self.root.mainloop()
-        except Exception as e:
-            print(f"[FATAL] 运行失败: {e}")
-            sys.exit(1)
+                    return False, str(e)
 
-if __name__ == "__main__":
-    try:
-        app = UltraSimpleWoWLauncher()
-        app.run()
-    except Exception as e:
-        import tkinter.messagebox as mb
-        mb.showerror("启动错误", f"登录器启动失败:\n{str(e)}")
-        sys.exit(1)
+
+        return False, "下载失败"
+
+
+    
+    def apply_patch(self, patch_name):
+        """应用补丁（已下载到Data目录）"""
+        # 补丁已经在Data目录，， return True, None
+
+
+    
+    def install_all_needed_patches(self, progress_window=None):
+        """安装所有需要的补丁"""
+        manifest, needed = self.check_for_updates()
+        if not needed:
+            return True
+        
+        for i, patch in enumerate(needed):
+            success, error = self.download_patch(patch, progress_window)
+            if not success:
+                return False
+            
+            success, error = self.apply_patch(patch['name'])
+            if not success:
+                return False
+            
+        
+        # 更新本地版本
+        local_version = self.get_local_version()
+        for patch in needed:
+            found = False
+            for local_patch in local_version.get('patches', []):
+                if local_patch.get('name') == patch['name']:
+                    local_patch['version'] = patch['version']
+                    found = True
+                    break
+            if not found:
+                local_version['patches'].append({
+                    'name': patch['name'],
+                    'version': patch['version']
+                })
+        
+        self.save_local_version(local_version)
+        return True
+
+
