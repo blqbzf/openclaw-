@@ -1,5 +1,7 @@
 using Avalonia;
-using Avalonia.ReactiveUI;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Logging.Serilog;
+using NolanWoWLauncher.Views;
 
 namespace NolanWoWLauncher;
 
@@ -17,6 +19,5 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace()
-            .UseReactiveUI();
+            .LogToTrace();
 }
