@@ -383,23 +383,12 @@ class WoWLauncher:
                 messagebox.showerror("错误", f"启动游戏失败:\n{e}")
     
     def verify_wow_md5(self, wow_exe):
-        """验证 Wow.exe MD5"""
-        expected_md5 = self.config.get("wow_md5", "")
-        if not expected_md5:
-            return True  # 没有配置 MD5
-        
-        try:
-            with open(wow_exe, 'rb') as f:
-                file_hash = hashlib.md5()
-                for chunk in iter(lambda: chunk := f.read(8192)):
-                    if chunk:
-                        file_hash.update(chunk)
-            
-            actual_md5 = file_hash.hexdigest()
-            return actual_md5 == expected_md5
-        except:
-            return True  #  读取失败
- 跳过验证
+        """验证 Wow.exe MD5（已禁用）"""
+        # MD5 校验功能已禁用
+        # 玩家可能使用了各种补丁或插件
+ MD5 校验会导致无法启动
+        # 为了更好的用户体验， 默认允许所有客户端
+        return True
     
     def open_register(self):
         """打开注册页面"""
