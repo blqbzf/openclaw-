@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr:clr-namespace:NolanWoWLauncher.Views"
+             xmlns:vm="clr:clr-namespace:NolanWoWLauncher.ViewModels"
+             Width="400" Height="300"
+             WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="20" Rows="4">
+        <TextBlock Grid.Row="0" Text="注册账号" FontSize="18" FontWeight="Bold" 
+                   HorizontalAlignment="Center" Margin="0,0,0,20" />
+
+        <StackPanel Grid.Row="1" Spacing="10">
+            <TextBox Watermark="用户名 (3-16个字符)" Text="{Binding RegisterUsername}" />
+            <TextBox Watermark="密码 (至少6个字符)" PasswordChar="*" 
+                   Text="{Binding RegisterPassword}" />
+            <TextBox Watermark="邮箱 (可选)" Text="{Binding RegisterEmail}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+            <Button Content="注册" Command="{Binding RegisterCommand}" Width="100" />
+            <Button Content="取消" Command="{Binding CloseRegisterDialogCommand}" Width="100" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" Text="{Binding StatusMessage}" 
+                   Foreground="Red" TextWrapping="Wrap" />
+    </Grid>
+</UserControl>

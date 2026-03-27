@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr:clr-namespace:NolanWoWLauncher.Views"
+             xmlns:vm="clr:clr-namespace:NolanWoWLauncher.Views.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr:clr-namespace:NolanWoWLauncher.Views"
+             xmlns:vm="clr:clr-namespace:NolanWoWLauncher.ViewModels"
+             MinWidth="800" MinHeight="450"
+             WindowStartupLocation="CenterScreen"
+             CanResize="False"
+             Background="{DynamicResource background.jpg}"
+             Icon="{DynamicResource icon.ico}">
+
+    <Window.Styles>
+        <Style Selector="^Window">
+            <Setter Property="Background" Value="{DynamicResource background.jpg}" />
+            <Setter Property="Stretch" Value="UniformToFill" />
+        </Style>
+    </Window.Styles>
+
+    <Grid Rows="4" Margin="20">
+        <!-- 顶部按钮区 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10">
+            <Button Content="选择目录" Command="{Binding SelectClientCommand}" Width="100" />
+            <Button Content="注册账号" Command="{Binding OpenRegisterDialogCommand}" Width="100" />
+            <Button Content="清除缓存" Command="{Binding CleanCacheCommand}" Width="100" />
+            <Button Content="检查更新" Command="{Binding CheckForUpdatesCommand}" Width="100" />
+            <Button Content="补丁管理" Width="100" />
+        </StackPanel>
+
+        <!-- 状态显示 -->
+        <TextBlock Grid.Row="1" Text="{Binding StatusMessage}" 
+                   FontSize="14" Foreground="White" Background="#80000000" Opacity="0.8"
+                   Padding="5" HorizontalAlignment="Center" />
+
+        <!-- 服务器更新信息 -->
+        <Border Grid.Row="2" Background="#CC000000" Opacity="0.6" CornerRadius="5">
+            <StackPanel Margin="10">
+                <TextBlock Text="📢 服务器更新信息" 
+                           FontSize="16" FontWeight="Bold" Foreground="White" />
+                <TextBlock Text="{Binding ServerUpdateInfo}" 
+                           FontSize="12" Foreground="White" TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <!-- 底部：进度条 + 启动按钮 -->
+        <Grid Grid.Row="3" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <!-- 进度条 -->
+            <StackPanel Grid.Column="0" Spacing="5">
+                <TextBlock Text="{Binding ProgressText}" FontSize="12" Foreground="White" />
+                <ProgressBar Value="{Binding DownloadProgress}" Maximum="100" Height="20" />
+            </StackPanel>
+            
+            <!-- 启动游戏按钮 -->
+            <Button Grid.Column="1" Content="启动游戏" 
+                    Command="{Binding LaunchGameCommand}"
+                    Width="150" Height="50"
+                    FontSize="18" FontWeight="Bold"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    CornerRadius="10" />
+        </Grid>
+    </Grid>
+</UserControl>
