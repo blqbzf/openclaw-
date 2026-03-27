@@ -1,0 +1,42 @@
+appId: com.nolanwow.launcher
+productName: 诺兰时光WoW登录器
+copyright: Copyright © 2026 诺兰时光
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - package.json
+  - dist/**/*
+  - node_modules/**/*
+  - public/**/*
+
+extraResources:
+  - from: public
+    to: public
+  - from: build
+    to: build
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+  icon: build/icon.ico
+  artifactName: ${productName}-${version}-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: ${productName}
+
+publish:
+  provider: github
+  owner: blqbzf
+  repo: openclaw-
