@@ -108,7 +108,7 @@ class PatchManager:
     def apply_patch(self, patch_name):
         """应用补丁（已下载到Data目录）"""
         # 补丁已经在Data目录
- return True, None
+        return True, None
 
 
     
@@ -317,9 +317,9 @@ class WoWLauncher:
         if not self.verify_wow_md5(wow_exe):
             result = messagebox.askyesno(
                 "文件校验失败",
-                f"Wow.exe 文件可能已被修改。\n\n"
-                f"这可能影响游戏体验。\n\n"
-                f"是否仍要继续启动？",
+                "Wow.exe 文件可能已被修改。\n\n"
+                "这可能影响游戏体验。\n\n"
+                "是否仍要继续启动？",
                 icon="warning"
             )
             if not result:
@@ -361,7 +361,7 @@ class WoWLauncher:
             # 下载并安装补丁
             if patch_manager.install_all_needed_patches(progress_window):
                 progress_window.destroy()
-                messagebox.showinfo("成功", "补丁安装完成！\n\n点击"确定"继续启动游戏")
+                messagebox.showinfo("成功", "补丁安装完成！\n\n点击\"确定\"继续启动游戏")
             else:
                 progress_window.destroy()
                 messagebox.showerror("错误", "补丁安装失败")
@@ -376,18 +376,17 @@ class WoWLauncher:
         
         # 启动游戏
         try:
-                os.chdir(client_path)
-                subprocess.Popen([wow_exe])
-                self.status_label.config(text="游戏已启动")
-                messagebox.showinfo("成功", "游戏启动成功！")
-            except Exception as e:
-                messagebox.showerror("错误", f"启动游戏失败:\n{e}")
+            os.chdir(client_path)
+            subprocess.Popen([wow_exe])
+            self.status_label.config(text="游戏已启动")
+            messagebox.showinfo("成功", "游戏启动成功！")
+        except Exception as e:
+            messagebox.showerror("错误", f"启动游戏失败:\n{e}")
     
     def verify_wow_md5(self, wow_exe):
         """验证 Wow.exe MD5（已禁用）"""
         # MD5 校验功能已禁用
-        # 玩家可能使用了各种补丁或插件
- MD5 校验会导致无法启动
+        # 玩家可能使用了各种补丁或插件， MD5 校验会导致无法启动
         # 为了更好的用户体验， 默认允许所有客户端
         return True
     
