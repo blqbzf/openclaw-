@@ -85,7 +85,8 @@ class LauncherApp:
         self.root.bind('<Configure>', self.on_resize)
 
         self.main = tk.Frame(self.canvas, bg='#07111f')
-        self.canvas.create_window((0, 0), window=self.main, anchor='nw', relwidth=1, relheight=1)
+        self.main_window = self.canvas.create_window((0, 0), window=self.main, anchor='nw')
+        self.canvas.bind('<Configure>', self.on_canvas_configure)
 
         top = tk.Frame(self.main, bg='#07111f')
         top.pack(fill='x', padx=24, pady=(24, 12))
@@ -167,6 +168,12 @@ class LauncherApp:
 
     def on_resize(self, _event=None):
         self.paint_background()
+
+    def on_canvas_configure(self, event):
+        try:
+            self.canvas.itemconfigure(self.main_window, width=event.width, height=event.height)
+        except Exception as e:
+            LOGGER.exception('on_canvas_configure failed: %s', e)
 
     def paint_background(self):
         if not (Image and ImageTk and BG_PATH.exists()):
