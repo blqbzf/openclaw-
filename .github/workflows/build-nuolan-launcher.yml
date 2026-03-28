@@ -39,16 +39,16 @@ jobs:
       - name: Package portable zip
         working-directory: nuolan-launcher-app
         run: |
-          Compress-Archive -Path dist/NuolanWoWLauncher/* -DestinationPath dist/NuolanWoWLauncher-win64.zip -Force
+          Compress-Archive -Path dist/NuolanWoWLauncher/* -DestinationPath dist/NuolanWoWLauncher-portable.zip -Force
 
-      - name: Upload launcher folder
+      - name: Upload single exe
         uses: actions/upload-artifact@v4
         with:
-          name: NuolanWoWLauncher-folder
-          path: nuolan-launcher-app/dist/NuolanWoWLauncher
+          name: NuolanWoWLauncher-exe
+          path: nuolan-launcher-app/dist/NuolanWoWLauncher.exe
 
-      - name: Upload launcher zip
+      - name: Upload portable zip
         uses: actions/upload-artifact@v4
         with:
-          name: NuolanWoWLauncher-win64
-          path: nuolan-launcher-app/dist/NuolanWoWLauncher-win64.zip
+          name: NuolanWoWLauncher-portable
+          path: nuolan-launcher-app/dist/NuolanWoWLauncher-portable.zip

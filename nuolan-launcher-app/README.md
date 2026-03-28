@@ -1,21 +1,39 @@
 # 诺兰时光魔兽登录器
 
-最小可测版，目标只做 4 件事：
+最小可测版：先验证注册、启动、登录、进服链路。
 
-1. 打开注册页
-2. 选择 WoW 客户端目录
-3. 自动写入 `realmlist.wtf`
-4. 启动游戏并连接服务器
+## 当前目标
 
-## 当前链路状态
+只验证 4 件事：
 
-已打通：
+1. 能打开注册页
+2. 能选择 WoW 客户端目录
+3. 能自动写入 `realmlist.wtf`
+4. 能启动游戏并连接服务器
 
-- 注册页：`http://1.14.59.54:5000`
-- 注册接口：`/api/register`
-- 游戏登录：已用新注册账号实测成功
-- 服务器：`1.14.59.54`
-- 客户端版本：`3.3.5a (12340)`
+## 当前已实现
+
+- 打开注册页按钮
+- 选择并保存 WoW 客户端目录
+- 自动校验 `Wow.exe` / `Wow-64.exe`
+- 自动写入 `realmlist.wtf`
+- 兼容路径：
+  - `Data/zhCN/realmlist.wtf`
+  - `Data/zhTW/realmlist.wtf`
+  - `Data/enUS/realmlist.wtf`
+  - 根目录 `realmlist.wtf`
+- 一键启动游戏
+- 检查 auth/world 基础在线状态
+- 日志文件：`launcher.log`
+
+## 注意
+
+当前注册链接配置为：
+
+- `http://1.14.59.54:5000`
+
+如果点击注册页后浏览器打不开，不代表登录器按钮没做，
+而是说明服务端注册站点本身当前没有正常返回页面。
 
 ## 本地开发运行
 
@@ -28,27 +46,37 @@ python wow_launcher.py
 
 ## Windows 打包
 
-在 Windows 上运行：
-
 ```bat
 build_windows.bat
 ```
 
-输出目录：
+输出结果：
 
 ```text
-dist\NuolanWoWLauncher\
+ dist\NuolanWoWLauncher.exe              # 单独可双击执行文件
+ dist\NuolanWoWLauncher\                # 便携目录（不是安装器）
+ ├─ NuolanWoWLauncher.exe
+ ├─ launcher_config.json
+ ├─ README.md
+ ├─ assets\background.jpg
 ```
 
 ## 最小测试流程
 
-1. 打开注册页创建账号
+1. 点击“打开注册页”
 2. 选择 WoW 客户端目录
 3. 点击“验证目录”
 4. 点击“启动游戏”
-5. 登录进服
+5. 看客户端是否成功连接到 `1.14.59.54`
 
-## 说明
+## 如果失败
 
-当前仓库先提交源码与打包脚本。
-Windows `.exe` 需在真实 Windows 环境执行 `build_windows.bat` 生成。
+请回传：
+
+- `launcher.log`
+- 卡在哪一步
+- 客户端目录是什么结构
+
+## 交付建议
+
+当前优先交付便携目录 / zip，不做安装器。

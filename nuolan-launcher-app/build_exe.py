@@ -20,7 +20,7 @@ cmd = [
     '--clean',
     '--windowed',
     '--name', APP_NAME,
-    '--onedir',
+    '--onefile',
     '--add-data', f'{ROOT / "launcher_config.json"}{SEPARATOR}.',
     '--add-data', f'{ROOT / "assets"}{SEPARATOR}assets',
     str(ROOT / 'wow_launcher.py'),
@@ -28,15 +28,24 @@ cmd = [
 
 subprocess.run(cmd, check=True)
 
-bundle_dir = DIST / APP_NAME
+single_exe = DIST / f'{APP_NAME}.exe'
+portable_dir = DIST / APP_NAME
+portable_dir.mkdir(parents=True, exist_ok=True)
+
+if single_exe.exists():
+    shutil.copy2(single_exe, portable_dir / single_exe.name)
+
 for extra in ['launcher_config.json', 'README.md']:
     src = ROOT / extra
     if src.exists():
-        shutil.copy2(src, bundle_dir / extra)
+        shutil.copy2(src, portable_dir / extra)
 
 assets_src = ROOT / 'assets'
-assets_dst = bundle_dir / 'assets'
-if assets_src.exists() and not assets_dst.exists():
+assets_dst = portable_dir / 'assets'
+if assets_src.exists():
+    if assets_dst.exists():
+        shutil.rmtree(assets_dst)
     shutil.copytree(assets_src, assets_dst)
 
-print(f'Build complete: {bundle_dir}')
+print(f'Build complete: {single_exe}')
+print(f'Portable dir: {portable_dir}')
