@@ -1,0 +1,54 @@
+name: build-nuolan-launcher
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/wow-launcher
+    paths:
+      - 'nuolan-launcher-app/**'
+      - '.github/workflows/build-nuolan-launcher.yml'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: nuolan-launcher-app
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build launcher
+        working-directory: nuolan-launcher-app
+        run: |
+          python build_exe.py
+
+      - name: Package portable zip
+        working-directory: nuolan-launcher-app
+        run: |
+          Compress-Archive -Path dist/NuolanWoWLauncher/* -DestinationPath dist/NuolanWoWLauncher-win64.zip -Force
+
+      - name: Upload launcher folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: NuolanWoWLauncher-folder
+          path: nuolan-launcher-app/dist/NuolanWoWLauncher
+
+      - name: Upload launcher zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: NuolanWoWLauncher-win64
+          path: nuolan-launcher-app/dist/NuolanWoWLauncher-win64.zip
