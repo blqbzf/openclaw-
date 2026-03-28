@@ -1,0 +1,40 @@
+{
+  "server_name": "诺兰时光魔兽",
+  "server_ip": "1.14.59.54",
+  "realmlist": "set realmlist 1.14.59.54",
+  "client_path": "",
+  "register_url": "http://1.14.59.54:5000",
+  "register_api_url": "http://1.14.59.54:5000/api/register",
+  "website_url": "http://1.14.59.54",
+  "patch_url": "http://1.14.59.54:8080",
+  "status_url": "http://1.14.59.54:8765/api/status",
+  "status_mode": "wow-panel",
+  "game_version": "3.3.5a (12340)",
+  "launcher_version": "0.3.0-minimal",
+  "window_title": "诺兰时光魔兽登录器",
+  "ui": {
+    "width": 960,
+    "height": 640,
+    "min_width": 900,
+    "min_height": 580,
+    "minimal_mode": true
+  },
+  "news": "最小可测版链路目标：\n\n1. 打开注册页\n2. 选择客户端目录\n3. 自动写入 realmlist.wtf\n4. 启动游戏并连接服务器\n\n说明：\n- 推荐使用 3.3.5a (12340) 客户端\n- 如果启动失败，请回传 launcher.log\n- 如果注册页打不开，说明服务端注册站点还未恢复，不是登录器按钮没做\n",
+  "buttons": {
+    "show_register": true,
+    "show_website": false,
+    "show_patch": false
+  },
+  "launch": {
+    "preferred_executables": [
+      "Wow.exe",
+      "Wow-64.exe"
+    ],
+    "realmlist_candidates": [
+      "Data/zhCN/realmlist.wtf",
+      "Data/zhTW/realmlist.wtf",
+      "Data/enUS/realmlist.wtf",
+      "realmlist.wtf"
+    ]
+  }
+}

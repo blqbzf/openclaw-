@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ server_name }} - 最小注册站</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(13, 24, 48, 0.92);
+      --line: #22365f;
+      --text: #edf4ff;
+      --muted: #9fb0d8;
+      --ok: #2bb673;
+      --btn: #235a9f;
+      --btn2: #182846;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei UI", "PingFang SC", sans-serif;
+      background: radial-gradient(circle at top, #17305b 0%, var(--bg) 55%);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 880px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.28);
+    }
+    h1 { margin: 0 0 10px; font-size: 34px; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    p, li { color: var(--muted); line-height: 1.7; }
+    .sub { margin-bottom: 18px; }
+    label { display: block; margin: 14px 0 8px; color: #cbd9ff; font-weight: 700; }
+    input {
+      width: 100%;
+      background: #08111f;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      outline: none;
+      font-size: 15px;
+    }
+    .actions { display: flex; gap: 10px; margin-top: 18px; }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .primary { background: var(--ok); color: white; }
+    .secondary { background: var(--btn2); color: white; }
+    .hint, .status {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: #08111f;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+    .status.ok { color: #b9ffd9; }
+    .status.err { color: #ffd0d0; }
+    @media (max-width: 860px) {
+      .wrap { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <h1>{{ server_name }}</h1>
+      <p class="sub">最小注册站，只做一件事：创建能登录游戏的账号。</p>
+      <form id="register-form">
+        <label for="username">游戏账号</label>
+        <input id="username" name="username" maxlength="16" placeholder="3-16 位，英文或数字" required>
+
+        <label for="password">游戏密码</label>
+        <input id="password" name="password" type="password" maxlength="32" placeholder="6-32 位" required>
+
+        <label for="email">邮箱（可选）</label>
+        <input id="email" name="email" maxlength="255" placeholder="可留空，系统会自动补一个占位邮箱">
+
+        <div class="actions">
+          <button class="primary" type="submit">立即注册</button>
+          <button class="secondary" type="button" id="health-btn">检查服务</button>
+        </div>
+      </form>
+      <div class="status" id="status">等待提交。</div>
+    </section>
+
+    <aside class="card">
+      <h2>当前说明</h2>
+      <ul>
+        <li>这是诺兰最小注册站，不是旧 P1 页面。</li>
+        <li>注册成功后，回登录器选择客户端目录并启动游戏。</li>
+        <li>推荐客户端版本：3.3.5a (12340)。</li>
+        <li>账号会自动转成大写写入 AzerothCore 认证库。</li>
+      </ul>
+      <div class="hint">测试链路：
+1. 在这里注册
+2. 打开最小登录器
+3. 自动写 realmlist.wtf
+4. 启动 Wow.exe
+5. 登录进服</div>
+    </aside>
+  </div>
+
+  <script>
+    const form = document.getElementById('register-form');
+    const statusBox = document.getElementById('status');
+    const healthBtn = document.getElementById('health-btn');
+
+    function setStatus(text, mode='') {
+      statusBox.textContent = text;
+      statusBox.className = 'status ' + mode;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        username: document.getElementById('username').value.trim(),
+        password: document.getElementById('password').value.trim(),
+        email: document.getElementById('email').value.trim(),
+      };
+      setStatus('正在提交注册请求...');
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setStatus(`注册成功\n账号：${data.username}\n现在可以回登录器启动游戏。`, 'ok');
+          form.reset();
+        } else {
+          setStatus(data.message || '注册失败', 'err');
+        }
+      } catch (err) {
+        setStatus('请求失败：' + err, 'err');
+      }
+    });
+
+    healthBtn.addEventListener('click', async () => {
+      setStatus('正在检查服务...');
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        setStatus(`服务正常\nserver=${data.server}`, 'ok');
+      } catch (err) {
+        setStatus('服务异常：' + err, 'err');
+      }
+    });
+  </script>
+</body>
+</html>
