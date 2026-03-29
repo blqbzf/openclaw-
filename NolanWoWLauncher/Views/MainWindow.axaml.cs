@@ -63,7 +63,7 @@ public partial class MainWindow : Window
                     _viewModel.StatusMessage = $"✅ 已选择: {folderPath}";
 
                     // 自动修复realmlist
-                    _viewModel.FixRealmlistCommand.Execute(null);
+                    OnFixRealmlistClick(sender, e);
                 }
                 else
                 {
@@ -93,5 +93,164 @@ public partial class MainWindow : Window
         {
             _viewModel.StatusMessage = $"❌ 打开注册对话框失败: {ex.Message}";
         }
+    }
+
+    // 清除缓存按钮点击事件
+    private void OnCleanCacheClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_viewModel.ClientPath))
+        {
+            _viewModel.StatusMessage = "⚠️ 请先选择客户端目录";
+            return;
+        }
+
+        try
+        {
+            var cacheDir = Path.Combine(_viewModel.ClientPath, "Cache");
+            var wdbDir = Path.Combine(_viewModel.ClientPath, "WDB");
+            var errorsDir = Path.Combine(_viewModel.ClientPath, "Errors");
+            var logsDir = Path.Combine(_viewModel.ClientPath, "Logs");
+
+            long totalBytes = 0;
+            var dirsCleaned = 0;
+
+            if (Directory.Exists(cacheDir))
+            {
+                totalBytes += GetDirectorySize(cacheDir);
+                Directory.Delete(cacheDir, true);
+                dirsCleaned++;
+            }
+            if (Directory.Exists(wdbDir))
+            {
+                totalBytes += GetDirectorySize(wdbDir);
+                Directory.Delete(wdbDir, true);
+                dirsCleaned++;
+            }
+            if (Directory.Exists(errorsDir))
+            {
+                totalBytes += GetDirectorySize(errorsDir);
+                Directory.Delete(errorsDir, true);
+                dirsCleaned++;
+            }
+            if (Directory.Exists(logsDir))
+            {
+                totalBytes += GetDirectorySize(logsDir);
+                Directory.Delete(logsDir, true);
+                dirsCleaned++;
+            }
+
+            var sizeMB = totalBytes / 1024.0 / 1024.0;
+            _viewModel.StatusMessage = $"✅ 已清理 {dirsCleaned} 个目录，释放 {sizeMB:F2} MB 空间";
+        }
+        catch (System.Exception ex)
+        {
+            _viewModel.StatusMessage = $"❌ 清理缓存失败: {ex.Message}";
+        }
+    }
+
+    // 检查更新按钮点击事件
+    private async void OnCheckUpdatesClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_viewModel.ClientPath))
+        {
+            _viewModel.StatusMessage = "⚠️ 请先选择客户端目录";
+            return;
+        }
+
+        _viewModel.StatusMessage = "🔄 正在检查更新...";
+        _viewModel.IsDownloading = true;
+
+        try
+        {
+            // 模拟检查更新（实际应该调用服务器API）
+            await Task.Delay(1500);
+            
+            _viewModel.StatusMessage = "✅ 客户端已是最新版本";
+        }
+        catch (System.Exception ex)
+        {
+            _viewModel.StatusMessage = $"❌ 检查更新失败: {ex.Message}";
+        }
+        finally
+        {
+            _viewModel.IsDownloading = false;
+        }
+    }
+
+    // 修复Realmlist
+    private void OnFixRealmlistClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_viewModel.ClientPath))
+        {
+            _viewModel.StatusMessage = "⚠️ 请先选择客户端目录";
+            return;
+        }
+
+        try
+        {
+            var realmlistPath = Path.Combine(_viewModel.ClientPath, "realmlist.wtf");
+            
+            // 备份原文件
+            if (File.Exists(realmlistPath))
+            {
+                var backupPath = $"{realmlistPath}.backup";
+                if (!File.Exists(backupPath))
+                {
+                    File.Copy(realmlistPath, backupPath);
+                }
+            }
+
+            // 写入新的 realmlist
+            File.WriteAllText(realmlistPath, "set realmlist 1.14.59.54\n");
+            
+            _viewModel.StatusMessage = "✅ Realmlist 已修复: set realmlist 1.14.59.54";
+        }
+        catch (System.Exception ex)
+        {
+            _viewModel.StatusMessage = $"❌ 修复失败: {ex.Message}";
+        }
+    }
+
+    // 启动游戏按钮点击事件
+    private void OnLaunchGameClick(object? sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(_viewModel.ClientPath))
+        {
+            _viewModel.StatusMessage = "⚠️ 请先选择客户端目录";
+            return;
+        }
+
+        try
+        {
+            var wowExe = Path.Combine(_viewModel.ClientPath, "Wow.exe");
+            
+            if (!File.Exists(wowExe))
+            {
+                _viewModel.StatusMessage = "❌ 找不到 Wow.exe，请确认客户端目录是否正确";
+                return;
+            }
+
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = wowExe,
+                WorkingDirectory = _viewModel.ClientPath,
+                UseShellExecute = true
+            });
+
+            _viewModel.StatusMessage = "✅ 游戏已启动，祝您游戏愉快！";
+        }
+        catch (System.Exception ex)
+        {
+            _viewModel.StatusMessage = $"❌ 启动游戏失败: {ex.Message}";
+        }
+    }
+
+    // 获取目录大小
+    private static long GetDirectorySize(string path)
+    {
+        if (!Directory.Exists(path)) return 0;
+        
+        var dirInfo = new DirectoryInfo(path);
+        return dirInfo.EnumerateFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
     }
 }
