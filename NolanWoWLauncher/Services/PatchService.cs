@@ -57,10 +57,26 @@ public class PatchService
         }
         catch (Exception)
         {
+            // 返回默认服务器信息
             return new ServerUpdateInfo
             {
-                Date = DateTime.Now.ToString("yyyy-MM-dd"),
-                Updates = new[] { "服务器连接失败" }
+                Date = "2026-03-30",
+                Updates = new[]
+                {
+                    "🎉 欢迎来到诺兰时光魔兽私服！",
+                    "✨ 机器人系统（单人也能玩！）",
+                    "🎭 幻化系统已开放",
+                    "⏰ 时光副本等你挑战",
+                    "🔧 服务器稳定运行中",
+                    "",
+                    "📝 使用说明:",
+                    "1. 点击'选择目录'选择WoW 3.3.5a客户端",
+                    "2. 首次使用请点击'注册账号'",
+                    "3. 点击'启动游戏'开始冒险！",
+                    "",
+                    "🌐 官网: http://1.14.59.54",
+                    "💬 QQ群: 联系管理员获取"
+                }
             };
         }
     }

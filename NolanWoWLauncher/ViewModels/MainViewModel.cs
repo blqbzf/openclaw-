@@ -62,6 +62,7 @@ public partial class MainViewModel : ObservableObject
     private void OpenRegisterDialog()
     {
         IsRegisterDialogOpen = true;
+        StatusMessage = "请在弹出的对话框中填写注册信息";
     }
 
     [RelayCommand]
