@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
+using NolanWoWLauncher.Services;
 using NolanWoWLauncher.ViewModels;
 
 namespace NolanWoWLauncher.Views;
@@ -12,6 +13,7 @@ namespace NolanWoWLauncher.Views;
 public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
+    private readonly PatchService _patchService;
 
     public MainWindow()
     {
@@ -20,6 +22,9 @@ public partial class MainWindow : Window
         // 直接创建并设置 ViewModel
         _viewModel = new MainViewModel();
         DataContext = _viewModel;
+        
+        // 创建补丁服务
+        _patchService = new PatchService();
         
 #if DEBUG
         this.AttachDevTools();
@@ -148,7 +153,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // 检查更新按钮点击事件
+    // 检查更新按钮点击事件 - 真正调用服务器API
     private async void OnCheckUpdatesClick(object? sender, RoutedEventArgs e)
     {
         if (string.IsNullOrWhiteSpace(_viewModel.ClientPath))
@@ -157,15 +162,49 @@ public partial class MainWindow : Window
             return;
         }
 
-        _viewModel.StatusMessage = "🔄 正在检查更新...";
+        _viewModel.StatusMessage = "🔄 正在连接服务器检查更新...";
         _viewModel.IsDownloading = true;
+        _viewModel.DownloadProgress = 0;
 
         try
         {
-            // 模拟检查更新（实际应该调用服务器API）
-            await Task.Delay(1500);
+            // 调用真正的补丁服务检查更新
+            var patches = await _patchService.CheckForUpdates();
             
-            _viewModel.StatusMessage = "✅ 客户端已是最新版本";
+            if (patches == null || patches.Length == 0)
+            {
+                _viewModel.StatusMessage = "✅ 客户端已是最新版本，无需更新";
+                _viewModel.IsDownloading = false;
+                return;
+            }
+
+            _viewModel.StatusMessage = $"📥 发现 {patches.Length} 个补丁需要下载";
+            _viewModel.ProgressText = "准备下载...";
+
+            // 下载每个补丁
+            for (int i = 0; i < patches.Length; i++)
+            {
+                var patch = patches[i];
+                _viewModel.ProgressText = $"正在下载: {patch.Name} ({i + 1}/{patches.Length})";
+                
+                var progress = new Progress<(int percentage, string status)>(p =>
+                {
+                    _viewModel.DownloadProgress = p.percentage;
+                    _viewModel.StatusMessage = $"📥 {p.status}";
+                });
+
+                var success = await _patchService.DownloadPatch(patch, _viewModel.ClientPath, progress);
+                
+                if (!success)
+                {
+                    _viewModel.StatusMessage = $"❌ {patch.Name} 下载失败";
+                    break;
+                }
+                
+                _viewModel.StatusMessage = $"✅ {patch.Name} 下载完成 ({i + 1}/{patches.Length})";
+            }
+
+            _viewModel.StatusMessage = "✅ 所有补丁已更新完成！";
         }
         catch (System.Exception ex)
         {
@@ -174,6 +213,8 @@ public partial class MainWindow : Window
         finally
         {
             _viewModel.IsDownloading = false;
+            _viewModel.DownloadProgress = 0;
+            _viewModel.ProgressText = "";
         }
     }
 
