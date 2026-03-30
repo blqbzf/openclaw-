@@ -34,12 +34,20 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Cursor" Value="Hand"/>
+<<<<<<< HEAD
+=======
+            <Setter Property="BoxShadow" Value="0 5 0 0 #3B240C, 0 10 28 0 #66000000"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
             <Setter Property="RenderTransform" Value="translateY(0px)"/>
             <Setter Property="Transitions">
                 <Transitions>
                     <BrushTransition Property="Background" Duration="0:0:0.12"/>
                     <BrushTransition Property="BorderBrush" Duration="0:0:0.12"/>
                     <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.08"/>
+<<<<<<< HEAD
+=======
+                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.08"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
                 </Transitions>
             </Setter>
         </Style>
@@ -47,12 +55,20 @@
         <Style Selector="Button.wow-btn:pointerover">
             <Setter Property="Background" Value="#A77E35"/>
             <Setter Property="BorderBrush" Value="#F3D892"/>
+<<<<<<< HEAD
+=======
+            <Setter Property="BoxShadow" Value="0 6 0 0 #3B240C, 0 14 34 0 #7A000000"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
             <Setter Property="RenderTransform" Value="translateY(-1px)"/>
         </Style>
 
         <Style Selector="Button.wow-btn:pressed">
             <Setter Property="Background" Value="#6F511C"/>
             <Setter Property="BorderBrush" Value="#C6A55D"/>
+<<<<<<< HEAD
+=======
+            <Setter Property="BoxShadow" Value="0 1 0 0 #3B240C, 0 4 12 0 #55000000"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
             <Setter Property="RenderTransform" Value="translateY(4px)"/>
         </Style>
 
@@ -64,16 +80,28 @@
             <Setter Property="BorderBrush" Value="#E8C36F"/>
             <Setter Property="Foreground" Value="#FFF6DA"/>
             <Setter Property="CornerRadius" Value="12"/>
+<<<<<<< HEAD
+=======
+            <Setter Property="BoxShadow" Value="0 6 0 0 #2A0708, 0 16 36 0 #88000000"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
         </Style>
 
         <Style Selector="Button.wow-btn.launch-btn:pointerover">
             <Setter Property="Background" Value="#942022"/>
             <Setter Property="BorderBrush" Value="#F4D992"/>
+<<<<<<< HEAD
+=======
+            <Setter Property="BoxShadow" Value="0 7 0 0 #2A0708, 0 18 40 0 #99000000"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
         </Style>
 
         <Style Selector="Button.wow-btn.launch-btn:pressed">
             <Setter Property="Background" Value="#5E0D0F"/>
             <Setter Property="BorderBrush" Value="#C7A95D"/>
+<<<<<<< HEAD
+=======
+            <Setter Property="BoxShadow" Value="0 1 0 0 #2A0708, 0 6 14 0 #66000000"/>
+>>>>>>> 9fe4edb (feat: polish launcher buttons with warcraft style motion)
         </Style>
     </Window.Styles>
 
