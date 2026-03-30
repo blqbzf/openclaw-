@@ -3,8 +3,12 @@ name: build-png-blp-mpq
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - 'assets/icons-src/**'
+      - 'patches/src/**'
+      - 'tools/BlpCli/**'
+      - 'tools/manifest/**'
       - '.github/workflows/build-png-blp-mpq.yml'
       - '.github/scripts/build-mpq.ps1'
 
@@ -12,32 +16,32 @@ jobs:
   build-patch:
     runs-on: windows-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Show staged icon
-        shell: pwsh
-        run: |
-          Get-ChildItem assets/icons-src | Format-Table -AutoSize
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Build BlpCli
         shell: pwsh
         run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
 
-      - name: Stage PNG / build BLP / reserve MPQ output
+      - name: Build MPQ
         shell: pwsh
-        run: .\.github\scripts\build-mpq.ps1 -IconName INV_Misc_Book_WuZiTianShu
+        run: .\.github\scripts\build-mpq.ps1
 
-      - name: Upload staged patch workspace
+      - name: Generate manifest + version
+        shell: pwsh
+        run: python .\tools\manifest\generate_patch_metadata.py
+
+      - name: Upload patch artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: wu-zi-tian-shu-patch-stage
+          name: nolan-patch-pack
           path: |
-            build/patch-work
-            dist
-            tools/BlpCli/bin/Release/net9.0
+            patches/dist
+            patch-manifests
