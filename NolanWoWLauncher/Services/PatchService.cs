@@ -26,6 +26,7 @@ public class PatchService
 {
     private readonly HttpClient _httpClient;
     private readonly string _serverUrl = "http://1.14.59.54:8080";
+    private readonly string _fallbackManifestUrl = "https://raw.githubusercontent.com/blqbzf/openclaw-/main/patch-manifests/manifest.json";
 
     public PatchService()
     {
@@ -44,7 +45,15 @@ public class PatchService
         }
         catch (Exception)
         {
-            return null;
+            try
+            {
+                var fallback = await _httpClient.GetStringAsync(_fallbackManifestUrl);
+                return JsonConvert.DeserializeObject<PatchInfo[]>(fallback);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 
@@ -87,7 +96,9 @@ public class PatchService
         try
         {
             var fileName = Path.GetFileName(patch.DownloadUrl);
-            var localPath = Path.Combine(clientPath, "Data", fileName);
+            var dataDir = Path.Combine(clientPath, "Data");
+            Directory.CreateDirectory(dataDir);
+            var localPath = Path.Combine(dataDir, fileName);
 
             // 检查文件是否已存在且哈希匹配
             if (File.Exists(localPath))

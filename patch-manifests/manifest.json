@@ -1,0 +1,10 @@
+[
+  {
+    "Name": "Patch-WuZiTianShu",
+    "Version": "2026.03.30.1",
+    "Size": 6660,
+    "Sha256": "a930546873dd656318bec46707d899d02c7d8b164fd4d6842dff177d474d0248",
+    "DownloadUrl": "https://github.com/blqbzf/openclaw-/raw/main/dist/patches/INV_Misc_Book_WuZiTianShu.blp",
+    "Required": true
+  }
+]
