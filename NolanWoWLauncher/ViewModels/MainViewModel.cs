@@ -128,6 +128,8 @@ public partial class MainViewModel : ObservableObject
         if (patches == null || patches.Length == 0)
         {
             StatusMessage = "✅ 暂无可用更新";
+            DownloadProgress = 0;
+            ProgressText = "";
             IsDownloading = false;
             return;
         }
@@ -158,7 +160,8 @@ public partial class MainViewModel : ObservableObject
             if (!success)
             {
                 StatusMessage = $"❌ {patch.Name} 下载失败";
-                break;
+                IsDownloading = false;
+                return;
             }
         }
 
@@ -169,11 +172,20 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void LaunchGame()
+    private async Task LaunchGame()
     {
         if (string.IsNullOrWhiteSpace(ClientPath))
         {
             StatusMessage = "请先选择客户端目录";
+            return;
+        }
+
+        StatusMessage = "启动前检查补丁...";
+        await CheckForUpdates();
+
+        if (IsDownloading)
+        {
+            StatusMessage = "补丁仍在处理中，请稍候...";
             return;
         }
 
