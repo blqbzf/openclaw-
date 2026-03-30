@@ -12,22 +12,18 @@ $OutputMpq = Join-Path $OutputDir $PatchName
 $MpqCliRoot = Join-Path $Root 'tools/mpqcli'
 $MpqCliBuild = Join-Path $MpqCliRoot 'build'
 $MpqCliExe = Join-Path $MpqCliBuild 'Release/mpqcli.exe'
-$VcpkgRoot = Join-Path $Root 'tools/vcpkg'
-$VcpkgExe = Join-Path $VcpkgRoot 'vcpkg.exe'
-$VcpkgToolchain = Join-Path $VcpkgRoot 'scripts/buildsystems/vcpkg.cmake'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
 if (!(Test-Path $MpqCliExe)) {
-  if (!(Test-Path $MpqCliRoot)) { git clone --depth 1 https://github.com/TheGrayDot/mpqcli $MpqCliRoot }
-  if (!(Test-Path $VcpkgRoot)) { git clone --depth 1 https://github.com/microsoft/vcpkg $VcpkgRoot }
-  if (!(Test-Path $VcpkgExe)) { & (Join-Path $VcpkgRoot 'bootstrap-vcpkg.bat') -disableMetrics }
-  if (!(Test-Path $VcpkgExe)) { throw 'vcpkg bootstrap failed' }
+  if (!(Test-Path $MpqCliRoot)) { git clone --depth 1 --recurse-submodules https://github.com/TheGrayDot/mpqcli $MpqCliRoot }
 
-  & $VcpkgExe install stormlib:x64-windows
-  if ($LASTEXITCODE -ne 0) { throw 'vcpkg stormlib install failed' }
+  Push-Location $MpqCliRoot
+  git submodule update --init --recursive
+  if ($LASTEXITCODE -ne 0) { throw 'mpqcli submodule init failed' }
+  Pop-Location
 
-  cmake -S $MpqCliRoot -B $MpqCliBuild -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgToolchain"
+  cmake -S $MpqCliRoot -B $MpqCliBuild -A x64
   if ($LASTEXITCODE -ne 0) { throw 'mpqcli cmake configure failed' }
 
   cmake --build $MpqCliBuild --config Release
@@ -47,7 +43,7 @@ if ($LASTEXITCODE -ne 0) { throw 'mpqcli create failed' }
 Push-Location $StagePath
 Get-ChildItem -Recurse -File | ForEach-Object {
   $localFile = $_.FullName
-  $relative = $localFile.Substring($StagePath.Length + 1).Replace('\\', '/').Replace('/', '/')
+  $relative = $localFile.Substring($StagePath.Length + 1).Replace('\\', '/')
   & $MpqCliExe add $OutputMpq $localFile $relative
   if ($LASTEXITCODE -ne 0) { throw "mpqcli add failed for $relative" }
 }
