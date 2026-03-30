@@ -12,11 +12,15 @@ $OutputMpq = Join-Path $OutputDir $PatchName
 $SmpqRoot = Join-Path $Root 'tools/smpq'
 $SmpqBuild = Join-Path $SmpqRoot 'build'
 <<<<<<< HEAD
+<<<<<<< HEAD
 $VcpkgRoot = Join-Path $Root 'tools/vcpkg'
 $VcpkgExe = Join-Path $VcpkgRoot 'vcpkg.exe'
 $VcpkgToolchain = Join-Path $VcpkgRoot 'scripts/buildsystems/vcpkg.cmake'
 =======
 >>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
+=======
+$VcpkgRoot = Join-Path $Root 'tools/vcpkg'
+>>>>>>> 875cf64 (fix: add stormlib dependency setup for github mpq build)
 $SmpqExe = Join-Path $SmpqBuild 'Release/smpq.exe'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
@@ -53,12 +57,26 @@ if (!(Test-Path $SmpqExe)) {
 }
 =======
 if (!(Test-Path $SmpqExe)) {
-  git clone --depth 1 https://github.com/bubio/smpq $SmpqRoot
-  cmake -S $SmpqRoot -B $SmpqBuild -A x64
+  if (!(Test-Path $SmpqRoot)) { git clone --depth 1 https://github.com/bubio/smpq $SmpqRoot }
+  if (!(Test-Path $VcpkgRoot)) { git clone --depth 1 https://github.com/microsoft/vcpkg $VcpkgRoot }
+  if (!(Test-Path (Join-Path $VcpkgRoot 'vcpkg.exe'))) { & (Join-Path $VcpkgRoot 'bootstrap-vcpkg.bat') -disableMetrics }
+  & (Join-Path $VcpkgRoot 'vcpkg.exe') install stormlib:x64-windows
+  if ($LASTEXITCODE -ne 0) { throw 'vcpkg stormlib install failed' }
+
+  cmake -S $SmpqRoot -B $SmpqBuild -A x64 -DWITH_KDE=OFF -DCMAKE_TOOLCHAIN_FILE=(Join-Path $VcpkgRoot 'scripts/buildsystems/vcpkg.cmake')
+  if ($LASTEXITCODE -ne 0) { throw 'smpq cmake configure failed' }
   cmake --build $SmpqBuild --config Release
+  if ($LASTEXITCODE -ne 0) { throw 'smpq build failed' }
 }
 
+<<<<<<< HEAD
 >>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
+=======
+if (!(Test-Path $SmpqExe)) {
+  $altExe = Join-Path $SmpqBuild 'smpq.exe'
+  if (Test-Path $altExe) { $SmpqExe = $altExe }
+}
+>>>>>>> 875cf64 (fix: add stormlib dependency setup for github mpq build)
 if (!(Test-Path $SmpqExe)) { throw "smpq build failed: $SmpqExe missing" }
 if (Test-Path $OutputMpq) { Remove-Item $OutputMpq -Force }
 
