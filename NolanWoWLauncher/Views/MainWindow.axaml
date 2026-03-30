@@ -42,15 +42,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- 顶部按钮栏 -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20" Spacing="10">
             <Button Content="📁 选择目录" Click="OnSelectClientClick" Width="110" Height="38"/>
             <Button Content="📝 注册账号" Click="OnRegisterClick" Width="110" Height="38"/>
-            <Button Content="🗑️ 清除缓存" Click="OnCleanCacheClick" Width="110" Height="38"/>
-            <Button Content="🔄 检查更新" Click="OnCheckUpdatesClick" Width="110" Height="38"/>
+            <Button Content="🗑️ 清除缓存" Command="{Binding CleanCacheCommand}" Width="110" Height="38"/>
+            <Button Content="🔄 检查更新" Command="{Binding CheckForUpdatesCommand}" Width="110" Height="38"/>
         </StackPanel>
 
-        <!-- 中央内容区 -->
         <Grid Grid.Row="1" Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -58,24 +56,21 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 状态显示 -->
             <Border Grid.Row="0" Background="#CC000000" Opacity="0.85" CornerRadius="8" Padding="12" Margin="0,0,0,10">
-                <TextBlock Text="{Binding StatusMessage}" 
-                          FontSize="15" Foreground="White" 
+                <TextBlock Text="{Binding StatusMessage}"
+                          FontSize="15" Foreground="White"
                           TextWrapping="Wrap" FontWeight="Medium"/>
             </Border>
 
-            <!-- 服务器更新信息 -->
             <Border Grid.Row="1" Background="#CC000000" Opacity="0.75" CornerRadius="8" Padding="15" Margin="0,0,0,10">
                 <ScrollViewer>
-                    <TextBlock Text="{Binding ServerUpdateInfo}" 
-                              FontSize="14" Foreground="White" 
+                    <TextBlock Text="{Binding ServerUpdateInfo}"
+                              FontSize="14" Foreground="White"
                               TextWrapping="Wrap"
                               LineHeight="22"/>
                 </ScrollViewer>
             </Border>
 
-            <!-- 客户端路径显示 -->
             <Border Grid.Row="2" Background="#CC000000" Opacity="0.85" CornerRadius="8" Padding="12">
                 <StackPanel Spacing="5">
                     <TextBlock Text="📂 客户端路径:" Foreground="#aaaaaa" FontSize="12"/>
@@ -84,26 +79,23 @@
             </Border>
         </Grid>
 
-        <!-- 底部：进度条 + 启动按钮 -->
         <Grid Grid.Row="2" Margin="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <!-- 进度条 -->
             <StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center" IsVisible="{Binding IsDownloading}">
-                <TextBlock Text="{Binding ProgressText}" 
+                <TextBlock Text="{Binding ProgressText}"
                           FontSize="13" Foreground="White"/>
-                <ProgressBar Value="{Binding DownloadProgress}" 
+                <ProgressBar Value="{Binding DownloadProgress}"
                             Maximum="100" Height="22"
                             Foreground="#4CAF50"/>
             </StackPanel>
 
-            <!-- 启动游戏按钮 -->
-            <Button Grid.Column="1" 
-                    Content="▶ 启动游戏" 
-                    Click="OnLaunchGameClick"
+            <Button Grid.Column="1"
+                    Content="▶ 启动游戏"
+                    Command="{Binding LaunchGameCommand}"
                     Width="160" Height="55"
                     FontSize="20" FontWeight="Bold"
                     Background="#4CAF50"
