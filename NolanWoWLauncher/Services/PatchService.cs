@@ -33,8 +33,8 @@ public class PatchService
 {
     private readonly HttpClient _httpClient;
     private readonly string _serverUrl = "http://1.14.59.54:8080";
-    private readonly string _fallbackManifestUrl = "https://raw.githubusercontent.com/blqbzf/openclaw-/main/patch-manifests/manifest.json";
-    private readonly string _fallbackVersionUrl = "https://raw.githubusercontent.com/blqbzf/openclaw-/main/patch-manifests/version.json";
+    private readonly string _fallbackManifestUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/manifest.json";
+    private readonly string _fallbackVersionUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/version.json";
 
     public PatchService()
     {
@@ -97,10 +97,6 @@ public class PatchService
         }
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 02b0239 (feat: add launcher manifest version validation and cache cleanup chain)
     public async Task<PatchVersionInfo?> GetPatchVersion()
     {
         try
@@ -213,19 +209,3 @@ public class PatchService
         catch { }
     }
 }
-
-    private static void CleanClientCaches(string clientPath)
-    {
-        TryDeleteDirectory(Path.Combine(clientPath, "Cache"));
-        TryDeleteDirectory(Path.Combine(clientPath, "WDB"));
-    }
-
-    private static void TryDeleteDirectory(string path)
-    {
-        try
-        {
-            if (Directory.Exists(path))
-                Directory.Delete(path, true);
-        }
-        catch { }
-    }

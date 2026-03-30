@@ -11,6 +11,10 @@ on:
       - 'tools/manifest/**'
       - '.github/workflows/build-png-blp-mpq.yml'
       - '.github/scripts/build-mpq.ps1'
+      - 'NolanWoWLauncher/Services/PatchService.cs'
+
+permissions:
+  contents: write
 
 jobs:
   build-patch:
@@ -46,11 +50,23 @@ jobs:
             patches/dist
             patch-manifests
 
+      - name: Publish patch release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: patches-latest
+          name: patches-latest
+          prerelease: false
+          make_latest: false
+          files: |
+            patches/dist/*.mpq
+            patch-manifests/manifest.json
+            patch-manifests/version.json
+
       - name: Upload failure logs
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: mpq-build-debug
           path: |
-            tools/smpq/build
-            tools/vcpkg/buildtrees
+            tools/mpqcli/build
+            tools/mpqcli/extern/StormLib
