@@ -28,7 +28,7 @@ jobs:
       - name: Build and Publish (win-x64 self-contained single-file)
         run: |
           cd NolanWoWLauncher
-          dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true
+          dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
