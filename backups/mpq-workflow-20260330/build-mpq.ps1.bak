@@ -9,17 +9,17 @@ $Root = (Get-Location).Path
 $StagePath = Join-Path $Root $StageDir
 $OutputDir = Join-Path $Root $OutDir
 $OutputMpq = Join-Path $OutputDir $PatchName
-$MpqCliRoot = Join-Path $Root 'tools/mpqcli'
-$MpqCliBuild = Join-Path $MpqCliRoot 'build'
-$MpqCliExe = Join-Path $MpqCliBuild 'Release/mpqcli.exe'
+$SmpqRoot = Join-Path $Root 'tools/smpq'
+$SmpqBuild = Join-Path $SmpqRoot 'build'
 $VcpkgRoot = Join-Path $Root 'tools/vcpkg'
 $VcpkgExe = Join-Path $VcpkgRoot 'vcpkg.exe'
 $VcpkgToolchain = Join-Path $VcpkgRoot 'scripts/buildsystems/vcpkg.cmake'
+$SmpqExe = Join-Path $SmpqBuild 'Release/smpq.exe'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
-if (!(Test-Path $MpqCliExe)) {
-  if (!(Test-Path $MpqCliRoot)) { git clone --depth 1 https://github.com/TheGrayDot/mpqcli $MpqCliRoot }
+if (!(Test-Path $SmpqExe)) {
+  if (!(Test-Path $SmpqRoot)) { git clone --depth 1 https://github.com/bubio/smpq $SmpqRoot }
   if (!(Test-Path $VcpkgRoot)) { git clone --depth 1 https://github.com/microsoft/vcpkg $VcpkgRoot }
   if (!(Test-Path $VcpkgExe)) { & (Join-Path $VcpkgRoot 'bootstrap-vcpkg.bat') -disableMetrics }
   if (!(Test-Path $VcpkgExe)) { throw 'vcpkg bootstrap failed' }
@@ -27,29 +27,28 @@ if (!(Test-Path $MpqCliExe)) {
   & $VcpkgExe install stormlib:x64-windows
   if ($LASTEXITCODE -ne 0) { throw 'vcpkg stormlib install failed' }
 
-  cmake -S $MpqCliRoot -B $MpqCliBuild -A x64 "-DCMAKE_TOOLCHAIN_FILE=$VcpkgToolchain"
-  if ($LASTEXITCODE -ne 0) { throw 'mpqcli cmake configure failed' }
+  cmake -S $SmpqRoot -B $SmpqBuild -A x64 -DWITH_KDE=OFF "-DCMAKE_TOOLCHAIN_FILE=$VcpkgToolchain"
+  if ($LASTEXITCODE -ne 0) { throw 'smpq cmake configure failed' }
 
-  cmake --build $MpqCliBuild --config Release
-  if ($LASTEXITCODE -ne 0) { throw 'mpqcli build failed' }
+  cmake --build $SmpqBuild --config Release --target smpq
+  if ($LASTEXITCODE -ne 0) { throw 'smpq build failed' }
 }
 
-if (!(Test-Path $MpqCliExe)) {
-  $altExe = Join-Path $MpqCliBuild 'mpqcli.exe'
-  if (Test-Path $altExe) { $MpqCliExe = $altExe }
+if (!(Test-Path $SmpqExe)) {
+  $altExe = Join-Path $SmpqBuild 'smpq.exe'
+  if (Test-Path $altExe) { $SmpqExe = $altExe }
 }
-if (!(Test-Path $MpqCliExe)) { throw "mpqcli build failed: $MpqCliExe missing" }
+if (!(Test-Path $SmpqExe)) { throw "smpq build failed: $SmpqExe missing" }
 if (Test-Path $OutputMpq) { Remove-Item $OutputMpq -Force }
 
-& $MpqCliExe create $OutputMpq
-if ($LASTEXITCODE -ne 0) { throw 'mpqcli create failed' }
-
 Push-Location $StagePath
+& $SmpqExe create $OutputMpq
+if ($LASTEXITCODE -ne 0) { throw 'smpq create failed' }
 Get-ChildItem -Recurse -File | ForEach-Object {
   $localFile = $_.FullName
-  $relative = $localFile.Substring($StagePath.Length + 1).Replace('\\', '/').Replace('/', '/')
-  & $MpqCliExe add $OutputMpq $localFile $relative
-  if ($LASTEXITCODE -ne 0) { throw "mpqcli add failed for $relative" }
+  $relative = $localFile.Substring($StagePath.Length + 1).Replace('/', '\\')
+  & $SmpqExe add $OutputMpq $relative $localFile
+  if ($LASTEXITCODE -ne 0) { throw "smpq add failed for $relative" }
 }
 Pop-Location
 
