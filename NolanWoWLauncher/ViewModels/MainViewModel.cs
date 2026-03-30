@@ -122,6 +122,7 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = "正在检查更新...";
         IsDownloading = true;
         
+        var versionInfo = await _patchService.GetPatchVersion();
         var patches = await _patchService.CheckForUpdates();
         
         if (patches == null || patches.Length == 0)
@@ -131,7 +132,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        StatusMessage = $"发现 {patches.Length} 个补丁需要更新";
+        StatusMessage = versionInfo != null ? $"发现 {patches.Length} 个补丁需要更新（渠道: {versionInfo.Channel}）" : $"发现 {patches.Length} 个补丁需要更新";
         
         // 开始下载
         for (int i = 0; i < patches.Length; i++)
@@ -144,6 +145,13 @@ public partial class MainViewModel : ObservableObject
                 DownloadProgress = p.percentage;
                 StatusMessage = p.status;
             });
+
+            var isCurrent = await _patchService.ValidateLocalPatch(patch, ClientPath);
+            if (isCurrent)
+            {
+                StatusMessage = $"✅ {patch.Name} 已是最新";
+                continue;
+            }
 
             var success = await _patchService.DownloadPatch(patch, ClientPath, progress);
             

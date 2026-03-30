@@ -16,6 +16,13 @@ public class PatchInfo
     public bool Required { get; set; }
 }
 
+public class PatchVersionInfo
+{
+    public string GeneratedAt { get; set; } = "";
+    public int PatchCount { get; set; }
+    public string Channel { get; set; } = "";
+}
+
 public class ServerUpdateInfo
 {
     public string Date { get; set; } = "";
@@ -27,6 +34,7 @@ public class PatchService
     private readonly HttpClient _httpClient;
     private readonly string _serverUrl = "http://1.14.59.54:8080";
     private readonly string _fallbackManifestUrl = "https://raw.githubusercontent.com/blqbzf/openclaw-/main/patch-manifests/manifest.json";
+    private readonly string _fallbackVersionUrl = "https://raw.githubusercontent.com/blqbzf/openclaw-/main/patch-manifests/version.json";
 
     public PatchService()
     {
@@ -90,6 +98,31 @@ public class PatchService
         }
     }
 
+
+    public async Task<PatchVersionInfo?> GetPatchVersion()
+    {
+        try
+        {
+            var response = await _httpClient.GetStringAsync(_fallbackVersionUrl);
+            return JsonConvert.DeserializeObject<PatchVersionInfo>(response);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<bool> ValidateLocalPatch(PatchInfo patch, string clientPath)
+    {
+        var fileName = Path.GetFileName(patch.DownloadUrl);
+        var localPath = Path.Combine(clientPath, "Data", fileName);
+        if (!File.Exists(localPath))
+            return false;
+
+        var localHash = await CalculateSha256(localPath);
+        return localHash.Equals(patch.Sha256, StringComparison.OrdinalIgnoreCase);
+    }
+
     public async Task<bool> DownloadPatch(PatchInfo patch, string clientPath,
         IProgress<(int percentage, string status)>? progress = null)
     {
@@ -148,6 +181,7 @@ public class PatchService
             }
 
             progress?.Report((100, "下载完成"));
+            CleanClientCaches(clientPath);
             return true;
         }
         catch (Exception ex)
@@ -165,3 +199,19 @@ public class PatchService
         return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
     }
 }
+
+    private static void CleanClientCaches(string clientPath)
+    {
+        TryDeleteDirectory(Path.Combine(clientPath, "Cache"));
+        TryDeleteDirectory(Path.Combine(clientPath, "WDB"));
+    }
+
+    private static void TryDeleteDirectory(string path)
+    {
+        try
+        {
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+        }
+        catch { }
+    }
