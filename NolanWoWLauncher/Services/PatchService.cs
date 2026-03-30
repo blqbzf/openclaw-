@@ -97,6 +97,10 @@ public class PatchService
         }
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 02b0239 (feat: add launcher manifest version validation and cache cleanup chain)
     public async Task<PatchVersionInfo?> GetPatchVersion()
     {
         try
@@ -209,3 +213,19 @@ public class PatchService
         catch { }
     }
 }
+
+    private static void CleanClientCaches(string clientPath)
+    {
+        TryDeleteDirectory(Path.Combine(clientPath, "Cache"));
+        TryDeleteDirectory(Path.Combine(clientPath, "WDB"));
+    }
+
+    private static void TryDeleteDirectory(string path)
+    {
+        try
+        {
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+        }
+        catch { }
+    }
