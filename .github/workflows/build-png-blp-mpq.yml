@@ -34,6 +34,12 @@ jobs:
         shell: pwsh
         run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
 
+      - name: Generate BLP from PNG source
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .\patches\src\wuzitianshu\Interface\Icons | Out-Null
+          .\tools\BlpCli\bin\Release\net9.0\publish\BlpCli.exe .\assets\icons-src\INV_Misc_Book_WuZiTianShu.png .\patches\src\wuzitianshu\Interface\Icons\INV_Misc_Book_WuZiTianShu.blp dxt3 1
+
       - name: Build MPQ
         shell: pwsh
         run: .\.github\scripts\build-mpq.ps1
