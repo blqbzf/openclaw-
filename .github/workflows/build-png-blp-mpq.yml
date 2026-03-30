@@ -27,14 +27,6 @@ jobs:
           python-version: '3.11'
 
       - name: Build BlpCli
-<<<<<<< HEAD
-=======
-        shell: pwsh
-        run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
-
-<<<<<<< HEAD
-      - name: Stage PNG / build BLP / reserve MPQ output
->>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
         shell: pwsh
         run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
 
@@ -42,24 +34,6 @@ jobs:
         shell: pwsh
         run: .\.github\scripts\build-mpq.ps1
 
-<<<<<<< HEAD
-=======
-      - name: Build MPQ
-        shell: pwsh
-        run: .\.github\scripts\build-mpq.ps1
-
->>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
-=======
-      - name: Upload failure logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: mpq-build-debug
-          path: |
-            tools/smpq/build
-            tools/vcpkg/buildtrees
-
->>>>>>> 875cf64 (fix: add stormlib dependency setup for github mpq build)
       - name: Generate manifest + version
         shell: pwsh
         run: python .\tools\manifest\generate_patch_metadata.py
@@ -69,8 +43,6 @@ jobs:
         with:
           name: nolan-patch-pack
           path: |
-<<<<<<< HEAD
-<<<<<<< HEAD
             patches/dist
             patch-manifests
 
@@ -82,12 +54,3 @@ jobs:
           path: |
             tools/smpq/build
             tools/vcpkg/buildtrees
-=======
-            build/patch-work
-            dist
-            tools/BlpCli/bin/Release/net9.0
->>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
-=======
-            patches/dist
-            patch-manifests
->>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
