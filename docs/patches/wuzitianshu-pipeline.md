@@ -16,8 +16,3 @@
 2. 产出 `.blp`
 3. 接入 MPQ 打包工具
 4. 上传最终 `.mpq` artifact / release asset
-
-## 仓库内工具链修复
-- 已内置 Windows 用 `BlpCli`（.NET 9 + rust_blp_converter.dll）
-- Actions 现可在仓库内直接完成 `PNG -> BLP`
-- 下一步只剩 `BLP -> MPQ` 打包步骤

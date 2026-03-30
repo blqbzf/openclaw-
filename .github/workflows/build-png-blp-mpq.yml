@@ -45,3 +45,12 @@ jobs:
           path: |
             patches/dist
             patch-manifests
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mpq-build-debug
+          path: |
+            tools/smpq/build
+            tools/vcpkg/buildtrees
