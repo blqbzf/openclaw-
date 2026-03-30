@@ -1,5 +1,5 @@
 param(
-  [string]$PatchName = "Patch-WuZiTianShu.mpq",
+  [string]$PatchName = "patch-Z.mpq",
   [string]$StageDir = "patches/src/wuzitianshu",
   [string]$OutDir = "patches/dist"
 )
