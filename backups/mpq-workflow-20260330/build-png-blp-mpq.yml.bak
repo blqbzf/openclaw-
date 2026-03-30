@@ -1,0 +1,56 @@
+name: build-png-blp-mpq
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/icons-src/**'
+      - 'patches/src/**'
+      - 'tools/BlpCli/**'
+      - 'tools/manifest/**'
+      - '.github/workflows/build-png-blp-mpq.yml'
+      - '.github/scripts/build-mpq.ps1'
+
+jobs:
+  build-patch:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build BlpCli
+        shell: pwsh
+        run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
+
+      - name: Build MPQ
+        shell: pwsh
+        run: .\.github\scripts\build-mpq.ps1
+
+      - name: Generate manifest + version
+        shell: pwsh
+        run: python .\tools\manifest\generate_patch_metadata.py
+
+      - name: Upload patch artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nolan-patch-pack
+          path: |
+            patches/dist
+            patch-manifests
+
+      - name: Upload failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mpq-build-debug
+          path: |
+            tools/smpq/build
+            tools/vcpkg/buildtrees
