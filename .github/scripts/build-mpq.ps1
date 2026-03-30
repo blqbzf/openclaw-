@@ -41,16 +41,7 @@ if (!(Test-Path $MpqCliExe)) {
 if (!(Test-Path $MpqCliExe)) { throw "mpqcli build failed: $MpqCliExe missing" }
 if (Test-Path $OutputMpq) { Remove-Item $OutputMpq -Force }
 
-& $MpqCliExe create $OutputMpq
+& $MpqCliExe create $StagePath -o $OutputMpq
 if ($LASTEXITCODE -ne 0) { throw 'mpqcli create failed' }
-
-Push-Location $StagePath
-Get-ChildItem -Recurse -File | ForEach-Object {
-  $localFile = $_.FullName
-  $relative = $localFile.Substring($StagePath.Length + 1).Replace('\\', '/')
-  & $MpqCliExe add $OutputMpq $localFile $relative
-  if ($LASTEXITCODE -ne 0) { throw "mpqcli add failed for $relative" }
-}
-Pop-Location
 
 Write-Host "[done ] MPQ => $OutputMpq"
