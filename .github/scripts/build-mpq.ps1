@@ -12,6 +12,7 @@ $OutputMpq = Join-Path $OutputDir $PatchName
 $MpqCliRoot = Join-Path $Root 'tools/mpqcli'
 $MpqCliBuild = Join-Path $MpqCliRoot 'build'
 $MpqCliExe = Join-Path $MpqCliBuild 'Release/mpqcli.exe'
+$MpqCliExeBin = Join-Path $MpqCliBuild 'bin/Release/mpqcli.exe'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
@@ -31,8 +32,11 @@ if (!(Test-Path $MpqCliExe)) {
 }
 
 if (!(Test-Path $MpqCliExe)) {
-  $altExe = Join-Path $MpqCliBuild 'mpqcli.exe'
-  if (Test-Path $altExe) { $MpqCliExe = $altExe }
+  if (Test-Path $MpqCliExeBin) { $MpqCliExe = $MpqCliExeBin }
+  else {
+    $altExe = Join-Path $MpqCliBuild 'mpqcli.exe'
+    if (Test-Path $altExe) { $MpqCliExe = $altExe }
+  }
 }
 if (!(Test-Path $MpqCliExe)) { throw "mpqcli build failed: $MpqCliExe missing" }
 if (Test-Path $OutputMpq) { Remove-Item $OutputMpq -Force }
