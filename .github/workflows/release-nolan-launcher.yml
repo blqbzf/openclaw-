@@ -3,8 +3,12 @@ name: Build and Release Nolan Launcher
 on:
   push:
     branches: [ main ]
-    tags:
-      - 'v*'
+    paths:
+      - 'NolanWoWLauncher/**'
+      - '.github/workflows/build-windows-launcher-avalonia.yml'
+      - '.github/workflows/release-nolan-launcher.yml'
+  tags:
+    - 'v*'
   workflow_dispatch:
 
 jobs:

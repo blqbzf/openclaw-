@@ -3,6 +3,10 @@ name: Build Windows Launcher (Avalonia)
 on:
   push:
     branches: [ main, feat/wow-launcher ]
+    paths:
+      - 'NolanWoWLauncher/**'
+      - '.github/workflows/build-windows-launcher-avalonia.yml'
+      - '.github/workflows/release-nolan-launcher.yml'
   workflow_dispatch:
 
 jobs:
