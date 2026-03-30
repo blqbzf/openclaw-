@@ -74,7 +74,6 @@ public class PatchService
         }
         catch (Exception)
         {
-            // 返回默认服务器信息
             return new ServerUpdateInfo
             {
                 Date = "2026-03-30",
@@ -97,7 +96,6 @@ public class PatchService
             };
         }
     }
-
 
     public async Task<PatchVersionInfo?> GetPatchVersion()
     {
@@ -133,7 +131,6 @@ public class PatchService
             Directory.CreateDirectory(dataDir);
             var localPath = Path.Combine(dataDir, fileName);
 
-            // 检查文件是否已存在且哈希匹配
             if (File.Exists(localPath))
             {
                 var localHash = await CalculateSha256(localPath);
@@ -144,7 +141,6 @@ public class PatchService
                 }
             }
 
-            // 下载文件
             using var response = await _httpClient.GetAsync(patch.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 
@@ -169,10 +165,8 @@ public class PatchService
                 }
             }
 
-            // 验证哈希
             progress?.Report((100, "验证文件完整性..."));
             var downloadedHash = await CalculateSha256(localPath);
-            
             if (!downloadedHash.Equals(patch.Sha256, StringComparison.OrdinalIgnoreCase))
             {
                 File.Delete(localPath);
@@ -198,7 +192,6 @@ public class PatchService
         var hashBytes = await sha256.ComputeHashAsync(stream);
         return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
     }
-}
 
     private static void CleanClientCaches(string clientPath)
     {
@@ -215,3 +208,4 @@ public class PatchService
         }
         catch { }
     }
+}
