@@ -10,6 +10,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ClientService _clientService;
     private readonly AccountService _accountService;
     private readonly PatchService _patchService;
+    private readonly LauncherSettingsService _settingsService;
 
     [ObservableProperty] private string _clientPath = "";
     [ObservableProperty] private string _statusMessage = "就绪";
@@ -28,9 +29,21 @@ public partial class MainViewModel : ObservableObject
         _clientService = new ClientService();
         _accountService = new AccountService();
         _patchService = new PatchService();
+        _settingsService = new LauncherSettingsService();
+
+        var settings = _settingsService.Load();
+        if (!string.IsNullOrWhiteSpace(settings.ClientPath))
+        {
+            ClientPath = settings.ClientPath;
+            StatusMessage = $"已记住客户端目录: {settings.ClientPath}";
+        }
         
-        // 自动获取服务器更新信息
         _ = LoadServerUpdates();
+    }
+
+    partial void OnClientPathChanged(string value)
+    {
+        _settingsService.Save(new LauncherSettings { ClientPath = value ?? string.Empty });
     }
 
     private async Task LoadServerUpdates()
@@ -54,7 +67,6 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void SelectClient()
     {
-        // 在视图中处理文件夹选择对话框
         StatusMessage = "请选择 WoW 客户端目录";
     }
     
@@ -136,7 +148,6 @@ public partial class MainViewModel : ObservableObject
 
         StatusMessage = versionInfo != null ? $"发现 {patches.Length} 个补丁需要更新（渠道: {versionInfo.Channel}）" : $"发现 {patches.Length} 个补丁需要更新";
         
-        // 开始下载
         for (int i = 0; i < patches.Length; i++)
         {
             var patch = patches[i];
