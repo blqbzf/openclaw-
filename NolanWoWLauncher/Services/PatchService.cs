@@ -13,6 +13,7 @@ public class PatchInfo
     public long Size { get; set; }
     public string Sha256 { get; set; } = "";
     public string DownloadUrl { get; set; } = "";
+    public string LocalRelativePath { get; set; } = "";
     public bool Required { get; set; }
 }
 
@@ -35,6 +36,15 @@ public class PatchService
     private readonly string _serverUrl = "http://1.14.59.54:8080";
     private readonly string _fallbackManifestUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/manifest.json";
     private readonly string _fallbackVersionUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/version.json";
+
+    private static string ResolveLocalPatchPath(PatchInfo patch, string clientPath)
+    {
+        var relativePath = string.IsNullOrWhiteSpace(patch.LocalRelativePath)
+            ? Path.Combine("Data", Path.GetFileName(patch.DownloadUrl))
+            : patch.LocalRelativePath.Replace('/', Path.DirectorySeparatorChar);
+
+        return Path.Combine(clientPath, relativePath);
+    }
 
     public PatchService()
     {
@@ -112,8 +122,7 @@ public class PatchService
 
     public async Task<bool> ValidateLocalPatch(PatchInfo patch, string clientPath)
     {
-        var fileName = Path.GetFileName(patch.DownloadUrl);
-        var localPath = Path.Combine(clientPath, "Data", fileName);
+        var localPath = ResolveLocalPatchPath(patch, clientPath);
         if (!File.Exists(localPath))
             return false;
 
@@ -126,10 +135,9 @@ public class PatchService
     {
         try
         {
-            var fileName = Path.GetFileName(patch.DownloadUrl);
-            var dataDir = Path.Combine(clientPath, "Data");
-            Directory.CreateDirectory(dataDir);
-            var localPath = Path.Combine(dataDir, fileName);
+            var localPath = ResolveLocalPatchPath(patch, clientPath);
+            var localDir = Path.GetDirectoryName(localPath) ?? Path.Combine(clientPath, "Data");
+            Directory.CreateDirectory(localDir);
 
             if (File.Exists(localPath))
             {

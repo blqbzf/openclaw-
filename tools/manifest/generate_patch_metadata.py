@@ -13,12 +13,18 @@ patches = []
 for file in sorted(PATCH_DIR.glob('*.mpq')):
     data = file.read_bytes()
     sha = hashlib.sha256(data).hexdigest()
+    relative_path = f'Data/{file.name}'
+    lower_name = file.name.lower()
+    if lower_name.startswith('patch-zhcn-'):
+        relative_path = f'Data/zhCN/{file.name}'
+
     patches.append({
         'Name': file.stem,
         'Version': datetime.now(timezone.utc).strftime('%Y.%m.%d.%H%M'),
         'Size': len(data),
         'Sha256': sha,
         'DownloadUrl': f'{BASE_DOWNLOAD}/{file.name}',
+        'LocalRelativePath': relative_path,
         'Required': True,
     })
 
