@@ -18,11 +18,20 @@ $SmpqExe = Join-Path $SmpqBuild 'Release/smpq.exe'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
+<<<<<<< HEAD
 if (!(Test-Path $SmpqExe)) {
   if (!(Test-Path $SmpqRoot)) { git clone --depth 1 https://github.com/bubio/smpq $SmpqRoot }
   if (!(Test-Path $VcpkgRoot)) { git clone --depth 1 https://github.com/microsoft/vcpkg $VcpkgRoot }
   if (!(Test-Path $VcpkgExe)) { & (Join-Path $VcpkgRoot 'bootstrap-vcpkg.bat') -disableMetrics }
   if (!(Test-Path $VcpkgExe)) { throw 'vcpkg bootstrap failed' }
+=======
+$Cli = Join-Path $Root 'tools/BlpCli/bin/Release/net9.0/BlpCli.exe'
+if (!(Test-Path $Cli)) { throw "BlpCli not found: $Cli" }
+& $Cli $SrcPng $BlpPath dxt5 0
+if ($LASTEXITCODE -ne 0) { throw "BlpCli failed with code $LASTEXITCODE" }
+Write-Host "[done ] PNG -> BLP => $BlpPath"
+Write-Host "[todo ] pack MPQ => $MpqPath"
+>>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
 
   & $VcpkgExe install stormlib:x64-windows
   if ($LASTEXITCODE -ne 0) { throw 'vcpkg stormlib install failed' }

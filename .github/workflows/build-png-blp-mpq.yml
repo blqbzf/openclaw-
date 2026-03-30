@@ -27,6 +27,13 @@ jobs:
           python-version: '3.11'
 
       - name: Build BlpCli
+<<<<<<< HEAD
+=======
+        shell: pwsh
+        run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
+
+      - name: Stage PNG / build BLP / reserve MPQ output
+>>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
         shell: pwsh
         run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
 
@@ -43,6 +50,7 @@ jobs:
         with:
           name: nolan-patch-pack
           path: |
+<<<<<<< HEAD
             patches/dist
             patch-manifests
 
@@ -54,3 +62,8 @@ jobs:
           path: |
             tools/smpq/build
             tools/vcpkg/buildtrees
+=======
+            build/patch-work
+            dist
+            tools/BlpCli/bin/Release/net9.0
+>>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
