@@ -25,11 +25,7 @@ jobs:
         run: |
           Get-ChildItem assets/icons-src | Format-Table -AutoSize
 
-      - name: Build BlpCli
-        shell: pwsh
-        run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
-
-      - name: Stage PNG / build BLP / reserve MPQ output
+      - name: Stage PNG / reserve BLP+MPQ outputs
         shell: pwsh
         run: .\.github\scripts\build-mpq.ps1 -IconName INV_Misc_Book_WuZiTianShu
 
@@ -40,4 +36,3 @@ jobs:
           path: |
             build/patch-work
             dist
-            tools/BlpCli/bin/Release/net9.0

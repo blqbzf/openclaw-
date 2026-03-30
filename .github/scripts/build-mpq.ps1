@@ -15,11 +15,10 @@ New-Item -ItemType Directory -Force -Path $IconsDir | Out-Null
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 Copy-Item $SrcPng (Join-Path $IconsDir "$IconName.png") -Force
 
-$Cli = Join-Path $Root 'tools/BlpCli/bin/Release/net9.0/BlpCli.exe'
-if (!(Test-Path $Cli)) { throw "BlpCli not found: $Cli" }
-& $Cli $SrcPng $BlpPath dxt5 0
-if ($LASTEXITCODE -ne 0) { throw "BlpCli failed with code $LASTEXITCODE" }
-Write-Host "[done ] PNG -> BLP => $BlpPath"
+# TODO: 下载/接入可稳定复用的 BLPConverter 可执行文件
+# 这里先为后续 workflow 预留标准输入输出位置
+Write-Host "[stage] PNG staged at $IconsDir"
+Write-Host "[todo ] convert PNG -> BLP => $BlpPath"
 Write-Host "[todo ] pack MPQ => $MpqPath"
 
 "ICON_NAME=$IconName" | Out-File -FilePath (Join-Path $OutDir "patch.env") -Encoding utf8
