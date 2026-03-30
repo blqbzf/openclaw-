@@ -1,0 +1,43 @@
+name: build-png-blp-mpq
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'assets/icons-src/**'
+      - '.github/workflows/build-png-blp-mpq.yml'
+      - '.github/scripts/build-mpq.ps1'
+
+jobs:
+  build-patch:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Show staged icon
+        shell: pwsh
+        run: |
+          Get-ChildItem assets/icons-src | Format-Table -AutoSize
+
+      - name: Build BlpCli
+        shell: pwsh
+        run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
+
+      - name: Stage PNG / build BLP / reserve MPQ output
+        shell: pwsh
+        run: .\.github\scripts\build-mpq.ps1 -IconName INV_Misc_Book_WuZiTianShu
+
+      - name: Upload staged patch workspace
+        uses: actions/upload-artifact@v4
+        with:
+          name: wu-zi-tian-shu-patch-stage
+          path: |
+            build/patch-work
+            dist
+            tools/BlpCli/bin/Release/net9.0
