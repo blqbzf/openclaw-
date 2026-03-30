@@ -32,6 +32,7 @@ jobs:
         shell: pwsh
         run: dotnet publish .\tools\BlpCli\BlpCli.csproj -c Release
 
+<<<<<<< HEAD
       - name: Stage PNG / build BLP / reserve MPQ output
 >>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
         shell: pwsh
@@ -41,6 +42,12 @@ jobs:
         shell: pwsh
         run: .\.github\scripts\build-mpq.ps1
 
+=======
+      - name: Build MPQ
+        shell: pwsh
+        run: .\.github\scripts\build-mpq.ps1
+
+>>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
       - name: Generate manifest + version
         shell: pwsh
         run: python .\tools\manifest\generate_patch_metadata.py
@@ -50,6 +57,7 @@ jobs:
         with:
           name: nolan-patch-pack
           path: |
+<<<<<<< HEAD
 <<<<<<< HEAD
             patches/dist
             patch-manifests
@@ -67,3 +75,7 @@ jobs:
             dist
             tools/BlpCli/bin/Release/net9.0
 >>>>>>> fb74f3d (feat: vendor windows blp converter into patch pipeline)
+=======
+            patches/dist
+            patch-manifests
+>>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)

@@ -11,13 +11,17 @@ $OutputDir = Join-Path $Root $OutDir
 $OutputMpq = Join-Path $OutputDir $PatchName
 $SmpqRoot = Join-Path $Root 'tools/smpq'
 $SmpqBuild = Join-Path $SmpqRoot 'build'
+<<<<<<< HEAD
 $VcpkgRoot = Join-Path $Root 'tools/vcpkg'
 $VcpkgExe = Join-Path $VcpkgRoot 'vcpkg.exe'
 $VcpkgToolchain = Join-Path $VcpkgRoot 'scripts/buildsystems/vcpkg.cmake'
+=======
+>>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
 $SmpqExe = Join-Path $SmpqBuild 'Release/smpq.exe'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 if (!(Test-Path $SmpqExe)) {
   if (!(Test-Path $SmpqRoot)) { git clone --depth 1 https://github.com/bubio/smpq $SmpqRoot }
@@ -47,12 +51,23 @@ if (!(Test-Path $SmpqExe)) {
   $altExe = Join-Path $SmpqBuild 'smpq.exe'
   if (Test-Path $altExe) { $SmpqExe = $altExe }
 }
+=======
+if (!(Test-Path $SmpqExe)) {
+  git clone --depth 1 https://github.com/bubio/smpq $SmpqRoot
+  cmake -S $SmpqRoot -B $SmpqBuild -A x64
+  cmake --build $SmpqBuild --config Release
+}
+
+>>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
 if (!(Test-Path $SmpqExe)) { throw "smpq build failed: $SmpqExe missing" }
 if (Test-Path $OutputMpq) { Remove-Item $OutputMpq -Force }
 
 Push-Location $StagePath
 & $SmpqExe create $OutputMpq
+<<<<<<< HEAD
 if ($LASTEXITCODE -ne 0) { throw 'smpq create failed' }
+=======
+>>>>>>> 0045fe5 (feat: add full repo patch pipeline structure for mpq manifests and versioning)
 Get-ChildItem -Recurse -File | ForEach-Object {
   $localFile = $_.FullName
   $relative = $localFile.Substring($StagePath.Length + 1).Replace('/', '\\')
