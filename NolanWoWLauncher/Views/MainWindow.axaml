@@ -56,13 +56,13 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" Background="#CC000000" Opacity="0.85" CornerRadius="8" Padding="12" Margin="0,0,0,10">
+            <Border Grid.Row="0" Background="#88000000" Opacity="0.62" CornerRadius="8" Padding="12" Margin="0,0,0,10">
                 <TextBlock Text="{Binding StatusMessage}"
                           FontSize="15" Foreground="White"
                           TextWrapping="Wrap" FontWeight="Medium"/>
             </Border>
 
-            <Border Grid.Row="1" Background="#CC000000" Opacity="0.75" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+            <Border Grid.Row="1" Background="#66000000" Opacity="0.48" CornerRadius="8" Padding="15" Margin="0,0,0,10">
                 <ScrollViewer>
                     <TextBlock Text="{Binding ServerUpdateInfo}"
                               FontSize="14" Foreground="White"
@@ -71,7 +71,7 @@
                 </ScrollViewer>
             </Border>
 
-            <Border Grid.Row="2" Background="#CC000000" Opacity="0.85" CornerRadius="8" Padding="12">
+            <Border Grid.Row="2" Background="#88000000" Opacity="0.62" CornerRadius="8" Padding="12">
                 <StackPanel Spacing="5">
                     <TextBlock Text="📂 客户端路径:" Foreground="#aaaaaa" FontSize="12"/>
                     <TextBlock Text="{Binding ClientPath}" Foreground="White" FontSize="13" TextWrapping="Wrap"/>
