@@ -33,7 +33,7 @@ public class ServerUpdateInfo
 public class PatchService
 {
     private readonly HttpClient _httpClient;
-    private readonly string _serverUrl = "http://1.14.59.54:8080";
+    private readonly string _baseUrl = "http://1.14.59.54";
     private readonly string _fallbackManifestUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/manifest.json";
     private readonly string _fallbackVersionUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/version.json";
 
@@ -58,7 +58,7 @@ public class PatchService
     {
         try
         {
-            var response = await _httpClient.GetStringAsync($"{_serverUrl}/api/patches/manifest");
+            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/manifest");
             return JsonConvert.DeserializeObject<PatchInfo[]>(response);
         }
         catch (Exception)
@@ -79,29 +79,27 @@ public class PatchService
     {
         try
         {
-            var response = await _httpClient.GetStringAsync($"{_serverUrl}/api/updates");
+            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/updates");
             return JsonConvert.DeserializeObject<ServerUpdateInfo>(response);
         }
         catch (Exception)
         {
             return new ServerUpdateInfo
             {
-                Date = "2026-03-30",
+                Date = "2026-04-02",
                 Updates = new[]
                 {
                     "🎉 欢迎来到诺兰时光魔兽私服！",
-                    "✨ 机器人系统（单人也能玩！）",
-                    "🎭 幻化系统已开放",
-                    "⏰ 时光副本等你挑战",
-                    "🔧 服务器稳定运行中",
+                    "🤖 机器人系统优化（单人也能玩！）",
+                    "🎨 Bot名字全面中文化",
+                    "💬 Bot聊天文本中文化",
+                    "📦 副本进组自动补装备",
+                    "📜 无字天书传送优化",
                     "",
                     "📝 使用说明:",
-                    "1. 点击'选择目录'选择WoW 3.3.5a客户端",
-                    "2. 首次使用请点击'注册账号'",
-                    "3. 点击'启动游戏'开始冒险！",
-                    "",
-                    "🌐 官网: http://1.14.59.54",
-                    "💬 QQ群: 联系管理员获取"
+                    "1. 选择WoW 3.3.5a客户端目录",
+                    "2. 首次使用请先注册账号",
+                    "3. 启动游戏开始冒险！"
                 }
             };
         }
@@ -111,12 +109,20 @@ public class PatchService
     {
         try
         {
-            var response = await _httpClient.GetStringAsync(_fallbackVersionUrl);
+            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/version");
             return JsonConvert.DeserializeObject<PatchVersionInfo>(response);
         }
         catch (Exception)
         {
-            return null;
+            try
+            {
+                var fallback = await _httpClient.GetStringAsync(_fallbackVersionUrl);
+                return JsonConvert.DeserializeObject<PatchVersionInfo>(fallback);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 
