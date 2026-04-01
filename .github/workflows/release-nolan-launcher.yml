@@ -5,7 +5,6 @@ on:
     branches: [ main ]
     paths:
       - 'NolanWoWLauncher/**'
-      - '.github/workflows/build-windows-launcher-avalonia.yml'
       - '.github/workflows/release-nolan-launcher.yml'
   tags:
     - 'v*'
@@ -34,11 +33,16 @@ jobs:
           cd NolanWoWLauncher
           dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false
 
+      - name: Rename to Chinese name
+        run: |
+          cd NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish
+          Copy-Item "NolanWoWLauncher.exe" "诺兰时光魔兽世界登录器V1.0.exe"
+
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: NolanWoWLauncher-Windows-x64
-          path: NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe
+          path: NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光魔兽世界登录器V1.0.exe
           retention-days: 30
           if-no-files-found: error
 
@@ -59,17 +63,17 @@ jobs:
         with:
           name: 诺兰时光魔兽启动器 ${{ github.ref_name }}
           body: |
-            ## 诺兰时光魔兽启动器
+            ## 诺兰时光魔兽世界登录器
             
             ### 功能特性
-            - ✅ 自动配置 realmlist
+            - ✅ 自动配置 realmlist（支持 zhCN/zhTW 多语言）
             - ✅ 一键启动游戏
             - ✅ 清理缓存
             - ✅ 检查更新
             - ✅ 在线注册账号
             
             ### 使用方法
-            1. 下载 `NolanWoWLauncher.exe`
+            1. 下载 `诺兰时光魔兽世界登录器V1.0.exe`
             2. 运行启动器
             3. 选择 WoW 3.3.5a 客户端目录
             4. 点击"启动游戏"
@@ -78,7 +82,7 @@ jobs:
             - 服务器名称: 诺兰时光魔兽
             - 服务器地址: 1.14.59.54
             - 客户端版本: 3.3.5a (12340)
-          files: ./artifact/NolanWoWLauncher.exe
+          files: ./artifact/诺兰时光魔兽世界登录器V1.0.exe
           draft: false
           prerelease: false
         env:
