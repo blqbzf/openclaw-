@@ -10,12 +10,10 @@ public class ClientService
     private static readonly string[] RequiredFiles =
     {
         "Wow.exe",
-        "realmlist.wtf",
         "Data/common.MPQ",
         "Data/common-2.MPQ",
         "Data/expansion.MPQ",
-        "Data/lichking.MPQ",
-        "Data/patch.MPQ"
+        "Data/lichking.MPQ"
     };
 
     private static readonly string[] CacheDirectories =
@@ -25,6 +23,18 @@ public class ClientService
         "Errors",
         "Logs"
     };
+
+    // 需要修复的 realmlist 路径（相对于游戏根目录）
+    private static readonly string[] RealmlistPaths =
+    {
+        "realmlist.wtf",
+        "Data/zhCN/realmlist.wtf",
+        "Data/zhTW/realmlist.wtf",
+        "Data/enCN/realmlist.wtf",
+        "Data/enTW/realmlist.wtf"
+    };
+
+    private const string RealmlistContent = "set realmlist 1.14.59.54";
 
     public bool ValidateClient(string clientPath)
     {
@@ -38,22 +48,30 @@ public class ClientService
     {
         try
         {
-            var realmlistPath = Path.Combine(clientPath, "realmlist.wtf");
-            
-            // 备份原文件
-            if (File.Exists(realmlistPath))
+            int fixedCount = 0;
+
+            foreach (var relPath in RealmlistPaths)
             {
-                var backupPath = $"{realmlistPath}.backup";
-                if (!File.Exists(backupPath))
+                var fullPath = Path.Combine(clientPath, relPath);
+                var dir = Path.GetDirectoryName(fullPath);
+
+                // 确保父目录存在
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                // 备份原文件
+                if (File.Exists(fullPath))
                 {
-                    File.Copy(realmlistPath, backupPath);
+                    var backupPath = fullPath + ".backup";
+                    if (!File.Exists(backupPath))
+                        File.Copy(fullPath, backupPath);
                 }
+
+                File.WriteAllText(fullPath, RealmlistContent + "\n");
+                fixedCount++;
             }
 
-            // 写入新的 realmlist
-            File.WriteAllText(realmlistPath, "set realmlist 1.14.59.54\n");
-            
-            return (true, "Realmlist 已修复为: set realmlist 1.14.59.54");
+            return (true, $"已修复 {fixedCount} 个 realmlist 文件\n服务器: {RealmlistContent}");
         }
         catch (Exception ex)
         {
@@ -91,6 +109,9 @@ public class ClientService
     {
         try
         {
+            // 启动前自动修复 realmlist
+            FixRealmlist(clientPath);
+
             var wowExe = Path.Combine(clientPath, "Wow.exe");
             if (!File.Exists(wowExe))
                 return false;
