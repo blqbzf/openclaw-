@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+*.tgz
+
+# Git
+.git/
+
+# Large files
+*.map
