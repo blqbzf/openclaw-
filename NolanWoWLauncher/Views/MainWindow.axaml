@@ -91,14 +91,11 @@
                     <Button Classes="wow-btn" Content="🗑️ 清除缓存" Command="{Binding CleanCacheCommand}" Width="110"/>
                     <Button Classes="wow-btn" Content="🔄 检查更新" Command="{Binding CheckForUpdatesCommand}" Width="110"/>
                 </StackPanel>
-                <TextBlock Text="诺兰时光"
-                           FontSize="32" FontWeight="Bold"
-                           Foreground="#FFD700"
-                           HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock.RenderTransform>
-                        <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="#000000" Opacity="0.8"/>
-                    </TextBlock.RenderTransform>
-                </TextBlock>
+                <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="#55000000" CornerRadius="8" Padding="15,6">
+                    <TextBlock Text="诺兰时光"
+                               FontSize="32" FontWeight="Bold"
+                               Foreground="#FFD700"/>
+                </Border>
             </Grid>
 
         <Grid Grid.Row="1" Margin="20">
