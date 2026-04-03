@@ -34,7 +34,7 @@ public class ClientService
         "Data/enTW/realmlist.wtf"
     };
 
-    private const string RealmlistContent = "set realmlist 1.14.59.54";
+    private const string RealmlistContent = "set realmlist 43.248.129.172";
 
     public bool ValidateClient(string clientPath)
     {
