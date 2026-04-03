@@ -10,7 +10,7 @@ namespace NolanWoWLauncher.Services;
 public class AccountService
 {
     private readonly HttpClient _httpClient;
-    private readonly string _apiUrl = "http://1.14.59.54:8080/api";
+    private readonly string _apiUrl = "http://43.248.129.172:88";
 
     public AccountService()
     {
