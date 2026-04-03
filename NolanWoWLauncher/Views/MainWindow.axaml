@@ -29,7 +29,7 @@
             <Setter Property="BorderBrush" Value="#E2C77A"/>
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -100,14 +100,14 @@
 
             <Border Grid.Row="0" Background="#88000000" Opacity="0.62" CornerRadius="8" Padding="12" Margin="0,0,0,10">
                 <TextBlock Text="{Binding StatusMessage}"
-                          FontSize="15" Foreground="White"
+                          FontSize="16" Foreground="#FFFFFF"
                           TextWrapping="Wrap" FontWeight="Medium"/>
             </Border>
 
-            <Border Grid.Row="1" Background="#66000000" Opacity="0.48" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+            <Border Grid.Row="1" Background="#88000000" Opacity="0.65" CornerRadius="8" Padding="15" Margin="0,0,0,10">
                 <ScrollViewer>
                     <TextBlock Text="{Binding ServerUpdateInfo}"
-                              FontSize="14" Foreground="White"
+                              FontSize="15" Foreground="#FFFFFF"
                               TextWrapping="Wrap"
                               LineHeight="22"/>
                 </ScrollViewer>
@@ -115,8 +115,8 @@
 
             <Border Grid.Row="2" Background="#88000000" Opacity="0.62" CornerRadius="8" Padding="12">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="📂 客户端路径:" Foreground="#aaaaaa" FontSize="12"/>
-                    <TextBlock Text="{Binding ClientPath}" Foreground="White" FontSize="13" TextWrapping="Wrap"/>
+                    <TextBlock Text="📂 客户端路径:" Foreground="#E0E0E0" FontSize="13"/>
+                    <TextBlock Text="{Binding ClientPath}" Foreground="#F5F5F5" FontSize="14" TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
         </Grid>
@@ -130,9 +130,15 @@
             <StackPanel Grid.Column="0" Spacing="5" VerticalAlignment="Center" IsVisible="{Binding IsDownloading}">
                 <TextBlock Text="{Binding ProgressText}"
                           FontSize="13" Foreground="White"/>
-                <ProgressBar Value="{Binding DownloadProgress}"
-                            Maximum="100" Height="22"
-                            Foreground="#4CAF50"/>
+                <Border Background="#2A1520" CornerRadius="11" BorderBrush="#4A2040" BorderThickness="2" Padding="2">
+                        <Border Background="#1A0A15" CornerRadius="9" Padding="2">
+                            <ProgressBar Value="{Binding DownloadProgress}"
+                                        Maximum="100" Height="18"
+                                        Minimum="0"
+                                        Foreground="#FF69B4"
+                                        CornerRadius="7"/>
+                        </Border>
+                    </Border>
             </StackPanel>
 
             <Button Grid.Column="1"
