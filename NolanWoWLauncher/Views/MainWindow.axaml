@@ -84,12 +84,22 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20" Spacing="10">
-            <Button Classes="wow-btn" Content="📁 选择目录" Click="OnSelectClientClick" Width="110"/>
-            <Button Classes="wow-btn" Content="📝 注册账号" Click="OnRegisterClick" Width="110"/>
-            <Button Classes="wow-btn" Content="🗑️ 清除缓存" Command="{Binding CleanCacheCommand}" Width="110"/>
-            <Button Classes="wow-btn" Content="🔄 检查更新" Command="{Binding CheckForUpdatesCommand}" Width="110"/>
-        </StackPanel>
+        <Grid Grid.Row="0" Margin="20">
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Classes="wow-btn" Content="📁 选择目录" Click="OnSelectClientClick" Width="110"/>
+                    <Button Classes="wow-btn" Content="📝 注册账号" Click="OnRegisterClick" Width="110"/>
+                    <Button Classes="wow-btn" Content="🗑️ 清除缓存" Command="{Binding CleanCacheCommand}" Width="110"/>
+                    <Button Classes="wow-btn" Content="🔄 检查更新" Command="{Binding CheckForUpdatesCommand}" Width="110"/>
+                </StackPanel>
+                <TextBlock Text="诺兰时光"
+                           FontSize="32" FontWeight="Bold"
+                           Foreground="#FFD700"
+                           HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock.RenderTransform>
+                        <DropShadowEffect ShadowDepth="2" BlurRadius="4" Color="#000000" Opacity="0.8"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+            </Grid>
 
         <Grid Grid.Row="1" Margin="20">
             <Grid.RowDefinitions>
