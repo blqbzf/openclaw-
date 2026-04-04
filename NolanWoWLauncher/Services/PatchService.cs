@@ -33,7 +33,7 @@ public class ServerUpdateInfo
 public class PatchService
 {
     private readonly HttpClient _httpClient;
-    private readonly string _baseUrl = "http://1.14.59.54";
+    private readonly string _baseUrl = "http://43.248.129.172";
     private readonly string _fallbackManifestUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/manifest.json";
     private readonly string _fallbackVersionUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/version.json";
 
