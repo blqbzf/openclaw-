@@ -41,10 +41,14 @@ public class PatchService
             : LauncherChannel.Release;
 
     private static string BuildManifestUrl(string baseUrl, string channel)
-        => $"{baseUrl}/api/patches/manifest.json?channel={NormalizeChannel(channel)}";
+        => NormalizeChannel(channel) == LauncherChannel.Release
+            ? $"{baseUrl}/api/patches/release/manifest.json"
+            : $"{baseUrl}/api/patches/test/manifest.json";
 
     private static string BuildVersionUrl(string baseUrl, string channel)
-        => $"{baseUrl}/api/patches/version.json?channel={NormalizeChannel(channel)}";
+        => NormalizeChannel(channel) == LauncherChannel.Release
+            ? $"{baseUrl}/api/patches/release/version.json"
+            : $"{baseUrl}/api/patches/test/version.json";
 
     private static string BuildFallbackManifestUrl(string channel)
         => $"https://github.com/blqbzf/openclaw-/releases/download/patches-{NormalizeChannel(channel)}/manifest.json";
