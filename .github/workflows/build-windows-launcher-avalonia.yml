@@ -39,3 +39,17 @@ jobs:
           path: NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe
           retention-days: 30
           if-no-files-found: error
+
+      - name: Create/Update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.1
+          name: "诺兰时光魔兽登录器 V1.1"
+          body: |
+            ## 诺兰时光魔兽世界登录器 V1.1
+            ### 更新
+            - 修复服务器地址为新IP 43.248.129.172
+            - 补丁下载地址更新
+          files: |
+            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe
+          overwrite: true
