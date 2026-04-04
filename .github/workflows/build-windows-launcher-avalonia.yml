@@ -46,13 +46,15 @@ jobs:
       - name: Create/Update Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1
-          name: "诺兰时光魔兽登录器 V1.1"
+          tag_name: v1.2
+          name: "诺兰时光魔兽登录器 V1.2"
           body: |
-            ## 诺兰时光魔兽世界登录器 V1.1
+            ## 诺兰时光魔兽世界登录器 V1.2
             ### 更新
-            - 修复服务器地址为新IP 43.248.129.172
-            - 补丁下载地址更新
+            - 启动游戏前自动修复 realmlist
+            - 补丁更新改为版本号比较，强制覆盖旧补丁
+            - 服务器地址更新为 43.248.129.172
+            - 补丁从服务器拉取（国内速度快）
           files: |
             NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe
           overwrite_files: true

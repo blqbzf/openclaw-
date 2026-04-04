@@ -200,6 +200,9 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
+        // 启动前自动修复 realmlist
+        FixRealmlist();
+
         if (_clientService.LaunchGame(ClientPath))
         {
             StatusMessage = "✅ 游戏已启动";
