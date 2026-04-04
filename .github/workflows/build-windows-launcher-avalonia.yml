@@ -45,15 +45,15 @@ jobs:
 
       - name: Rename exe
         shell: pwsh
-        run: Rename-Item 'NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe' '诺兰时光登录器v1.3.exe'
+        run: Rename-Item 'NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe' '诺兰时光登录器v1.4.exe'
 
       - name: Create/Update Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.3
-          name: "诺兰时光魔兽登录器 V1.3"
+          tag_name: v1.4
+          name: "诺兰时光魔兽登录器 V1.4"
           body: |
-            ## 诺兰时光魔兽世界登录器 V1.3
+            ## 诺兰时光魔兽世界登录器 V1.4
             ### 更新
             - 启动游戏前强制删除并重写 realmlist
             - 补丁更新改为版本号比较，强制覆盖旧补丁
@@ -61,5 +61,5 @@ jobs:
             - 修复 API 路径
             - 启动时显示 realmlist 修复状态
           files: |
-            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.3.exe
+            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.4.exe
           overwrite_files: true

@@ -147,16 +147,12 @@ public class PatchService
 
             if (File.Exists(localPath))
             {
-                // 版本不匹配则强制覆盖（不依赖SHA256缓存）
-                var localVersionFile = Path.Combine(localDir, ".patch-version");
-                var currentVersion = File.Exists(localVersionFile) ? await File.ReadAllTextAsync(localVersionFile) : "";
-                if (currentVersion == patch.Version)
+                var localHash = await CalculateSha256(localPath);
+                if (localHash.Equals(patch.Sha256, StringComparison.OrdinalIgnoreCase))
                 {
                     progress?.Report((100, "文件已是最新"));
                     return true;
                 }
-                // 版本不同，删除旧文件强制重新下载
-                File.Delete(localPath);
             }
 
             using var response = await _httpClient.GetAsync(patch.DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
@@ -192,11 +188,8 @@ public class PatchService
                 return false;
             }
 
-            // 保存版本号，下次启动用于快速判断
-            var versionFile = Path.Combine(localDir, ".patch-version");
-            await File.WriteAllTextAsync(versionFile, patch.Version);
-
             progress?.Report((100, "下载完成"));
+            CleanClientCaches(clientPath);
             CleanClientCaches(clientPath);
             return true;
         }
