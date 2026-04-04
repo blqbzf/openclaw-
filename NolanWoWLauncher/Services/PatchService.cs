@@ -58,7 +58,7 @@ public class PatchService
     {
         try
         {
-            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/manifest");
+            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/manifest.json");
             return JsonConvert.DeserializeObject<PatchInfo[]>(response);
         }
         catch (Exception)
@@ -109,7 +109,7 @@ public class PatchService
     {
         try
         {
-            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/version");
+            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/version.json");
             return JsonConvert.DeserializeObject<PatchVersionInfo>(response);
         }
         catch (Exception)
