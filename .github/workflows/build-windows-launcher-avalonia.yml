@@ -9,6 +9,9 @@ on:
       - '.github/workflows/release-nolan-launcher.yml'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -52,4 +55,4 @@ jobs:
             - 补丁下载地址更新
           files: |
             NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe
-          overwrite: true
+          overwrite_files: true
