@@ -59,12 +59,17 @@ public class ClientService
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
-                // 备份原文件
+                // 删除旧文件（包括backup），强制覆盖
                 if (File.Exists(fullPath))
                 {
-                    var backupPath = fullPath + ".backup";
-                    if (!File.Exists(backupPath))
-                        File.Copy(fullPath, backupPath);
+                    File.SetAttributes(fullPath, FileAttributes.Normal);
+                    File.Delete(fullPath);
+                }
+                var backupPath = fullPath + ".backup";
+                if (File.Exists(backupPath))
+                {
+                    File.SetAttributes(backupPath, FileAttributes.Normal);
+                    File.Delete(backupPath);
                 }
 
                 File.WriteAllText(fullPath, RealmlistContent + "\n");

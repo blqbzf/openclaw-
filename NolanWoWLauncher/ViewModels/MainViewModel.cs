@@ -201,11 +201,11 @@ public partial class MainViewModel : ObservableObject
         }
 
         // 启动前自动修复 realmlist
-        FixRealmlist();
+        var (fixOk, fixMsg) = _clientService.FixRealmlist(ClientPath);
 
         if (_clientService.LaunchGame(ClientPath))
         {
-            StatusMessage = "✅ 游戏已启动";
+            StatusMessage = fixOk ? $"✅ 游戏已启动 ({fixMsg})" : $"⚠️ 游戏已启动，但realmlist修复失败: {fixMsg}";
         }
         else
         {
