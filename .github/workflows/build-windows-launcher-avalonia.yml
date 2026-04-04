@@ -43,6 +43,10 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
+      - name: Rename exe
+        shell: pwsh
+        run: Rename-Item 'NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe' '诺兰时光登录器v1.2.exe'
+
       - name: Create/Update Release
         uses: softprops/action-gh-release@v2
         with:
@@ -56,5 +60,5 @@ jobs:
             - 服务器地址更新为 43.248.129.172
             - 补丁从服务器拉取（国内速度快）
           files: |
-            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe
+            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.2.exe
           overwrite_files: true
