@@ -45,20 +45,20 @@ jobs:
 
       - name: Rename exe
         shell: pwsh
-        run: Rename-Item 'NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe' '诺兰时光登录器v1.6.exe'
+        run: Rename-Item 'NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/NolanWoWLauncher.exe' '诺兰时光登录器v1.7.exe'
 
       - name: Create/Update Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.6
-          name: "诺兰时光魔兽登录器 V1.6"
+          tag_name: v1.7
+          name: "诺兰时光魔兽登录器 V1.7"
           body: |
-            ## 诺兰时光魔兽世界登录器 V1.6
+            ## 诺兰时光魔兽世界登录器 V1.7
             ### 更新
-            - 增加正式服 / 测试服双分区选择
-            - 启动前按分区修复 realmlist
-            - 补丁检查切到服务端 release / test 独立清单路径
-            - 记住上次选择的分区
+            - 修复双补丁需要点两次检查更新的问题
+            - 先统一筛出待更新补丁，再连续顺序下载
+            - 下载完成后立即二次校验，避免第一包后流程中断
+            - 保留正式服 / 测试服双分区与分频道拉取
           files: |
-            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.6.exe
+            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.7.exe
           overwrite_files: true

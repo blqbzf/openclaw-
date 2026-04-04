@@ -165,55 +165,77 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = "正在检查更新...";
         IsDownloading = true;
 
-        var patchChannel = SelectedRealm?.PatchChannel ?? LauncherChannel.Release;
-        var versionInfo = await _patchService.GetPatchVersion(patchChannel);
-        var patches = await _patchService.CheckForUpdates(patchChannel);
-
-        if (patches == null || patches.Length == 0)
+        try
         {
-            StatusMessage = "✅ 暂无可用更新";
-            DownloadProgress = 0;
-            ProgressText = "";
-            IsDownloading = false;
-            return;
-        }
+            var patchChannel = SelectedRealm?.PatchChannel ?? LauncherChannel.Release;
+            var versionInfo = await _patchService.GetPatchVersion(patchChannel);
+            var patches = await _patchService.CheckForUpdates(patchChannel);
 
-        var realmName = SelectedRealm?.Name ?? "正式服";
-        StatusMessage = versionInfo != null
-            ? $"发现 {patches.Length} 个补丁需要更新（分区: {realmName} / 渠道: {versionInfo.Channel}）"
-            : $"发现 {patches.Length} 个补丁需要更新（分区: {realmName}）";
-
-        for (int i = 0; i < patches.Length; i++)
-        {
-            var patch = patches[i];
-            ProgressText = $"正在下载: {patch.Name} ({i + 1}/{patches.Length})";
-
-            var progress = new Progress<(int percentage, string status)>(p =>
+            if (patches == null || patches.Length == 0)
             {
-                DownloadProgress = p.percentage;
-                StatusMessage = p.status;
-            });
-
-            var isCurrent = await _patchService.ValidateLocalPatch(patch, ClientPath);
-            if (isCurrent)
-            {
-                StatusMessage = $"✅ {patch.Name} 已是最新";
-                continue;
-            }
-
-            var success = await _patchService.DownloadPatch(patch, ClientPath, progress);
-            if (!success)
-            {
-                StatusMessage = $"❌ {patch.Name} 下载失败";
-                IsDownloading = false;
+                StatusMessage = "✅ 暂无可用更新";
+                DownloadProgress = 0;
+                ProgressText = "";
                 return;
             }
-        }
 
-        IsDownloading = false;
-        DownloadProgress = 0;
-        ProgressText = "";
-        StatusMessage = "✅ 所有补丁已更新完成";
+            var pendingPatches = new System.Collections.Generic.List<PatchInfo>();
+            foreach (var patch in patches)
+            {
+                var isCurrent = await _patchService.ValidateLocalPatch(patch, ClientPath);
+                if (!isCurrent)
+                {
+                    pendingPatches.Add(patch);
+                }
+            }
+
+            if (pendingPatches.Count == 0)
+            {
+                StatusMessage = "✅ 所有补丁已是最新";
+                DownloadProgress = 0;
+                ProgressText = "";
+                return;
+            }
+
+            var realmName = SelectedRealm?.Name ?? "正式服";
+            StatusMessage = versionInfo != null
+                ? $"发现 {pendingPatches.Count} 个补丁需要更新（分区: {realmName} / 渠道: {versionInfo.Channel}）"
+                : $"发现 {pendingPatches.Count} 个补丁需要更新（分区: {realmName}）";
+
+            for (int i = 0; i < pendingPatches.Count; i++)
+            {
+                var patch = pendingPatches[i];
+                ProgressText = $"正在下载: {patch.Name} ({i + 1}/{pendingPatches.Count})";
+
+                var progress = new Progress<(int percentage, string status)>(p =>
+                {
+                    DownloadProgress = p.percentage;
+                    StatusMessage = $"[{i + 1}/{pendingPatches.Count}] {patch.Name} - {p.status}";
+                });
+
+                var success = await _patchService.DownloadPatch(patch, ClientPath, progress);
+                if (!success)
+                {
+                    StatusMessage = $"❌ {patch.Name} 下载失败";
+                    return;
+                }
+
+                var finalOk = await _patchService.ValidateLocalPatch(patch, ClientPath);
+                if (!finalOk)
+                {
+                    StatusMessage = $"❌ {patch.Name} 下载后校验失败";
+                    return;
+                }
+            }
+
+            DownloadProgress = 0;
+            ProgressText = "";
+            StatusMessage = "✅ 所有补丁已连续更新完成";
+        }
+        finally
+        {
+            IsDownloading = false;
+        }
     }
 
     [RelayCommand]
