@@ -159,13 +159,7 @@ public partial class MainViewModel : ObservableObject
                 StatusMessage = p.status;
             });
 
-            var isCurrent = await _patchService.ValidateLocalPatch(patch, ClientPath);
-            if (isCurrent)
-            {
-                StatusMessage = $"✅ {patch.Name} 已是最新";
-                continue;
-            }
-
+            // DownloadPatch 内部已处理版本号比较和SHA256校验
             var success = await _patchService.DownloadPatch(patch, ClientPath, progress);
             
             if (!success)
