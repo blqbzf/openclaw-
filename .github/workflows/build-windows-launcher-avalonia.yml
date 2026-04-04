@@ -61,5 +61,5 @@ jobs:
             - 修复 API 路径
             - 启动时显示 realmlist 修复状态
           files: |
-            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.2.exe
+            NolanWoWLauncher/bin/Release/net8.0-windows/win-x64/publish/诺兰时光登录器v1.3.exe
           overwrite_files: true
