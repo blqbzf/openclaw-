@@ -34,7 +34,7 @@ public class ClientService
         "Data/enTW/realmlist.wtf"
     };
 
-    private const string RealmlistContent = "set realmlist 43.248.129.172";
+    private const string DefaultRealmHost = "43.248.129.172";
 
     public bool ValidateClient(string clientPath)
     {
@@ -44,22 +44,22 @@ public class ClientService
         return RequiredFiles.All(file => File.Exists(Path.Combine(clientPath, file)));
     }
 
-    public (bool success, string message) FixRealmlist(string clientPath)
+    public (bool success, string message) FixRealmlist(string clientPath, string? realmHost = null)
     {
         try
         {
             int fixedCount = 0;
+            var targetHost = string.IsNullOrWhiteSpace(realmHost) ? DefaultRealmHost : realmHost.Trim();
+            var realmlistContent = $"set realmlist {targetHost}";
 
             foreach (var relPath in RealmlistPaths)
             {
                 var fullPath = Path.Combine(clientPath, relPath);
                 var dir = Path.GetDirectoryName(fullPath);
 
-                // 确保父目录存在
                 if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
+                    Directory.CreateDirectory(dir!);
 
-                // 删除旧文件（包括backup），强制覆盖
                 if (File.Exists(fullPath))
                 {
                     File.SetAttributes(fullPath, FileAttributes.Normal);
@@ -72,11 +72,11 @@ public class ClientService
                     File.Delete(backupPath);
                 }
 
-                File.WriteAllText(fullPath, RealmlistContent + "\n");
+                File.WriteAllText(fullPath, realmlistContent + "\n");
                 fixedCount++;
             }
 
-            return (true, $"已修复 {fixedCount} 个 realmlist 文件\n服务器: {RealmlistContent}");
+            return (true, $"已修复 {fixedCount} 个 realmlist 文件\n服务器: {realmlistContent}");
         }
         catch (Exception ex)
         {
@@ -110,12 +110,11 @@ public class ClientService
         }
     }
 
-    public bool LaunchGame(string clientPath)
+    public bool LaunchGame(string clientPath, string? realmHost = null)
     {
         try
         {
-            // 启动前自动修复 realmlist
-            FixRealmlist(clientPath);
+            FixRealmlist(clientPath, realmHost);
 
             var wowExe = Path.Combine(clientPath, "Wow.exe");
             if (!File.Exists(wowExe))

@@ -34,8 +34,23 @@ public class PatchService
 {
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl = "http://43.248.129.172:88";
-    private readonly string _fallbackManifestUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/manifest.json";
-    private readonly string _fallbackVersionUrl = "https://github.com/blqbzf/openclaw-/releases/download/patches-latest/version.json";
+
+    private static string NormalizeChannel(string? channel)
+        => string.Equals(channel, LauncherChannel.Test, StringComparison.OrdinalIgnoreCase)
+            ? LauncherChannel.Test
+            : LauncherChannel.Release;
+
+    private static string BuildManifestUrl(string baseUrl, string channel)
+        => $"{baseUrl}/api/patches/manifest.json?channel={NormalizeChannel(channel)}";
+
+    private static string BuildVersionUrl(string baseUrl, string channel)
+        => $"{baseUrl}/api/patches/version.json?channel={NormalizeChannel(channel)}";
+
+    private static string BuildFallbackManifestUrl(string channel)
+        => $"https://github.com/blqbzf/openclaw-/releases/download/patches-{NormalizeChannel(channel)}/manifest.json";
+
+    private static string BuildFallbackVersionUrl(string channel)
+        => $"https://github.com/blqbzf/openclaw-/releases/download/patches-{NormalizeChannel(channel)}/version.json";
 
     private static string ResolveLocalPatchPath(PatchInfo patch, string clientPath)
     {
@@ -54,18 +69,19 @@ public class PatchService
         };
     }
 
-    public async Task<PatchInfo[]?> CheckForUpdates()
+    public async Task<PatchInfo[]?> CheckForUpdates(string? channel = null)
     {
+        var resolvedChannel = NormalizeChannel(channel);
         try
         {
-            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/manifest.json");
+            var response = await _httpClient.GetStringAsync(BuildManifestUrl(_baseUrl, resolvedChannel));
             return JsonConvert.DeserializeObject<PatchInfo[]>(response);
         }
         catch (Exception)
         {
             try
             {
-                var fallback = await _httpClient.GetStringAsync(_fallbackManifestUrl);
+                var fallback = await _httpClient.GetStringAsync(BuildFallbackManifestUrl(resolvedChannel));
                 return JsonConvert.DeserializeObject<PatchInfo[]>(fallback);
             }
             catch (Exception)
@@ -105,18 +121,19 @@ public class PatchService
         }
     }
 
-    public async Task<PatchVersionInfo?> GetPatchVersion()
+    public async Task<PatchVersionInfo?> GetPatchVersion(string? channel = null)
     {
+        var resolvedChannel = NormalizeChannel(channel);
         try
         {
-            var response = await _httpClient.GetStringAsync($"{_baseUrl}/api/patches/version.json");
+            var response = await _httpClient.GetStringAsync(BuildVersionUrl(_baseUrl, resolvedChannel));
             return JsonConvert.DeserializeObject<PatchVersionInfo>(response);
         }
         catch (Exception)
         {
             try
             {
-                var fallback = await _httpClient.GetStringAsync(_fallbackVersionUrl);
+                var fallback = await _httpClient.GetStringAsync(BuildFallbackVersionUrl(resolvedChannel));
                 return JsonConvert.DeserializeObject<PatchVersionInfo>(fallback);
             }
             catch (Exception)

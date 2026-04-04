@@ -7,6 +7,13 @@ namespace NolanWoWLauncher.Services;
 public class LauncherSettings
 {
     public string ClientPath { get; set; } = string.Empty;
+    public string SelectedChannel { get; set; } = LauncherChannel.Release;
+}
+
+public static class LauncherChannel
+{
+    public const string Release = "release";
+    public const string Test = "test";
 }
 
 public class LauncherSettingsService

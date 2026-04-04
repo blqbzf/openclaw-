@@ -86,6 +86,10 @@
 
         <Grid Grid.Row="0" Margin="20">
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <ComboBox Width="120"
+                              ItemsSource="{Binding RealmProfiles}"
+                              SelectedItem="{Binding SelectedRealm}"
+                              HorizontalContentAlignment="Center"/>
                     <Button Classes="wow-btn" Content="📁 选择目录" Click="OnSelectClientClick" Width="110"/>
                     <Button Classes="wow-btn" Content="📝 注册账号" Click="OnRegisterClick" Width="110"/>
                     <Button Classes="wow-btn" Content="🗑️ 清除缓存" Command="{Binding CleanCacheCommand}" Width="110"/>

@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,11 +20,30 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _progressText = "";
     [ObservableProperty] private bool _isDownloading;
     [ObservableProperty] private string _serverUpdateInfo = "正在获取服务器更新信息...";
-    
+
     [ObservableProperty] private string _registerUsername = "";
     [ObservableProperty] private string _registerPassword = "";
     [ObservableProperty] private string _registerEmail = "";
     [ObservableProperty] private bool _isRegisterDialogOpen;
+    [ObservableProperty] private RealmProfile? _selectedRealm;
+
+    public ObservableCollection<RealmProfile> RealmProfiles { get; } = new()
+    {
+        new RealmProfile
+        {
+            Key = LauncherChannel.Release,
+            Name = "正式服",
+            RealmHost = "43.248.129.172",
+            PatchChannel = LauncherChannel.Release
+        },
+        new RealmProfile
+        {
+            Key = LauncherChannel.Test,
+            Name = "测试服",
+            RealmHost = "43.248.129.172",
+            PatchChannel = LauncherChannel.Test
+        }
+    };
 
     public MainViewModel()
     {
@@ -32,18 +53,35 @@ public partial class MainViewModel : ObservableObject
         _settingsService = new LauncherSettingsService();
 
         var settings = _settingsService.Load();
+        SelectedRealm = RealmProfiles.FirstOrDefault(x => x.Key == settings.SelectedChannel) ?? RealmProfiles.First();
+
         if (!string.IsNullOrWhiteSpace(settings.ClientPath))
         {
             ClientPath = settings.ClientPath;
-            StatusMessage = $"已记住客户端目录: {settings.ClientPath}";
+            StatusMessage = $"已记住客户端目录: {settings.ClientPath}（当前分区: {SelectedRealm?.Name}）";
         }
-        
+
         _ = LoadServerUpdates();
     }
 
-    partial void OnClientPathChanged(string value)
+    partial void OnClientPathChanged(string value) => SaveSettings();
+
+    partial void OnSelectedRealmChanged(RealmProfile? value)
     {
-        _settingsService.Save(new LauncherSettings { ClientPath = value ?? string.Empty });
+        SaveSettings();
+        if (value != null)
+        {
+            StatusMessage = $"当前分区已切换为：{value.Name}";
+        }
+    }
+
+    private void SaveSettings()
+    {
+        _settingsService.Save(new LauncherSettings
+        {
+            ClientPath = ClientPath ?? string.Empty,
+            SelectedChannel = SelectedRealm?.Key ?? LauncherChannel.Release
+        });
     }
 
     private async Task LoadServerUpdates()
@@ -69,7 +107,7 @@ public partial class MainViewModel : ObservableObject
     {
         StatusMessage = "请选择 WoW 客户端目录";
     }
-    
+
     [RelayCommand]
     private void OpenRegisterDialog()
     {
@@ -86,14 +124,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        if (_clientService.ValidateClient(ClientPath))
-        {
-            StatusMessage = "✅ 客户端文件完整";
-        }
-        else
-        {
-            StatusMessage = "❌ 客户端文件不完整";
-        }
+        StatusMessage = _clientService.ValidateClient(ClientPath) ? "✅ 客户端文件完整" : "❌ 客户端文件不完整";
     }
 
     [RelayCommand]
@@ -105,7 +136,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var (success, message) = _clientService.FixRealmlist(ClientPath);
+        var (success, message) = _clientService.FixRealmlist(ClientPath, SelectedRealm?.RealmHost);
         StatusMessage = success ? $"✅ {message}" : $"❌ {message}";
     }
 
@@ -133,10 +164,11 @@ public partial class MainViewModel : ObservableObject
 
         StatusMessage = "正在检查更新...";
         IsDownloading = true;
-        
-        var versionInfo = await _patchService.GetPatchVersion();
-        var patches = await _patchService.CheckForUpdates();
-        
+
+        var patchChannel = SelectedRealm?.PatchChannel ?? LauncherChannel.Release;
+        var versionInfo = await _patchService.GetPatchVersion(patchChannel);
+        var patches = await _patchService.CheckForUpdates(patchChannel);
+
         if (patches == null || patches.Length == 0)
         {
             StatusMessage = "✅ 暂无可用更新";
@@ -146,13 +178,16 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        StatusMessage = versionInfo != null ? $"发现 {patches.Length} 个补丁需要更新（渠道: {versionInfo.Channel}）" : $"发现 {patches.Length} 个补丁需要更新";
-        
+        var realmName = SelectedRealm?.Name ?? "正式服";
+        StatusMessage = versionInfo != null
+            ? $"发现 {patches.Length} 个补丁需要更新（分区: {realmName} / 渠道: {versionInfo.Channel}）"
+            : $"发现 {patches.Length} 个补丁需要更新（分区: {realmName}）";
+
         for (int i = 0; i < patches.Length; i++)
         {
             var patch = patches[i];
             ProgressText = $"正在下载: {patch.Name} ({i + 1}/{patches.Length})";
-            
+
             var progress = new Progress<(int percentage, string status)>(p =>
             {
                 DownloadProgress = p.percentage;
@@ -167,7 +202,6 @@ public partial class MainViewModel : ObservableObject
             }
 
             var success = await _patchService.DownloadPatch(patch, ClientPath, progress);
-            
             if (!success)
             {
                 StatusMessage = $"❌ {patch.Name} 下载失败";
@@ -200,10 +234,9 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        // 启动前自动修复 realmlist
-        var (fixOk, fixMsg) = _clientService.FixRealmlist(ClientPath);
+        var (fixOk, fixMsg) = _clientService.FixRealmlist(ClientPath, SelectedRealm?.RealmHost);
 
-        if (_clientService.LaunchGame(ClientPath))
+        if (_clientService.LaunchGame(ClientPath, SelectedRealm?.RealmHost))
         {
             StatusMessage = fixOk ? $"✅ 游戏已启动 ({fixMsg})" : $"⚠️ 游戏已启动，但realmlist修复失败: {fixMsg}";
         }
@@ -223,9 +256,8 @@ public partial class MainViewModel : ObservableObject
         }
 
         var (success, message) = await _accountService.Register(RegisterUsername, RegisterPassword, RegisterEmail);
-        
         StatusMessage = success ? $"✅ {message}" : $"❌ {message}";
-        
+
         if (success)
         {
             IsRegisterDialogOpen = false;
