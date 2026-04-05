@@ -1,7 +1,7 @@
 param(
   [string]$PatchName = "patch-Z.mpq",
   [string]$LocalePatchName = "patch-zhCN-Z.mpq",
-  [string]$StageDir = "patches/src/wuzitianshu",
+  [string]$StageDir = "patches/stage",
   [string]$OutDir = "patches/dist"
 )
 
@@ -15,8 +15,17 @@ $MpqCliRoot = Join-Path $Root 'tools/mpqcli'
 $MpqCliBuild = Join-Path $MpqCliRoot 'build'
 $MpqCliExe = Join-Path $MpqCliBuild 'Release/mpqcli.exe'
 $MpqCliExeBin = Join-Path $MpqCliBuild 'bin/Release/mpqcli.exe'
+$PatchSrcRoot = Join-Path $Root 'patches/src'
 
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
+if (Test-Path $StagePath) { Remove-Item $StagePath -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $StagePath | Out-Null
+
+Get-ChildItem -Path $PatchSrcRoot -Directory | Sort-Object Name | ForEach-Object {
+  $srcDir = $_.FullName
+  Write-Host "[merge] $($_.Name)"
+  Copy-Item (Join-Path $srcDir '*') $StagePath -Recurse -Force -ErrorAction SilentlyContinue
+}
 
 if (!(Test-Path $MpqCliExe)) {
   if (!(Test-Path $MpqCliRoot)) { git clone --depth 1 --recurse-submodules https://github.com/TheGrayDot/mpqcli $MpqCliRoot }
